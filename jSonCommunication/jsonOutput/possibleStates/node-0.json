@@ -1,0 +1,1 @@
+{"type":"POSSIBLE_STATES_MSG","srcIP":"/127.23.23.3:2323","dstIP":"/127.0.0.1:5555","srcID":"CLIENT","dstID":"node-0","possibleStates":[0.1,0.2,0.3,0.4,0.5],"initState":0.1}

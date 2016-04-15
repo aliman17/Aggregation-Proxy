@@ -1,0 +1,1 @@
+{"type":"AGGREGATE_MSG","srcIP":"/127.0.0.1:5555","dstIP":"/127.23.23.3:2323","srcID":"node-0","dstID":null,"aggregationFunction":["AVG","SUM","MIN","MAX","COUNT","SUMSQR","STDEV"],"value":[0.1,0.1,0.1,0.1,1.0,0.010000000000000002,0.0]}

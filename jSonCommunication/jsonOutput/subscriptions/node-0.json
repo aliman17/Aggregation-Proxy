@@ -1,0 +1,1 @@
+{"type":"SUBSCRIPTION_MSG","srcIP":"/127.23.23.3:2323","dstIP":"/127.0.0.1:5555","srcID":"CLIENT","dstID":"node-0","subscriptionPolicy":"ON_UPDATE","millisTime":null,"aggregationFunctions":["SUM","COUNT","MAX","SUMSQR"]}
