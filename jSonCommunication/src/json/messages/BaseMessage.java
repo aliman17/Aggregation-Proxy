@@ -1,5 +1,8 @@
 package json.messages;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import json.enums.MessageTypes;
 
 public abstract class BaseMessage {
@@ -55,6 +58,19 @@ public abstract class BaseMessage {
 	
 	public void setDstID(String dstID) {
 		this.dstID = dstID;
+	}
+	
+	public String toJson(){
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonInString;
+		try {
+			jsonInString = mapper.writeValueAsString(this);
+			return jsonInString;
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			// TODO : Is this OK?
+			return "Error in toJson conversion";
+		}
 	}
 	
 	public String toString() {
