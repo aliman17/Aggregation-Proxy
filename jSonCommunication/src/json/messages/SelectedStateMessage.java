@@ -22,6 +22,13 @@ public class SelectedStateMessage extends BaseMessage{
 		this.type = MessageTypes.SELECTED_STATE_MSG;
 	}
 	
+	public SelectedStateMessage(String srcIP, String dstIP, String srcID, String dstID,
+			double selectedState) {
+		super(srcIP, dstIP, srcID, dstID);
+		this.type = MessageTypes.SELECTED_STATE_MSG;
+		this.selectedState = selectedState;
+	}
+	
 	public String toString() {
 		StringBuilder sb = new StringBuilder("[\n");
 		sb.append(super.toString());		

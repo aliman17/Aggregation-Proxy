@@ -1,12 +1,15 @@
 package json.messages;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import json.enums.MessageTypes;
 
 /**
  * Represents a message that includes list of possible states.
  * This should be the first message the client sends. 
  * 
- * @author nikolijo
+ * @author nikolijo, ales_omerzel
  *
  */
 public class PossibleStatesMessage extends BaseMessage {
@@ -21,6 +24,14 @@ public class PossibleStatesMessage extends BaseMessage {
 	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID) {
 		super(srcIP, dstIP, srcID, dstID);
 		this.type = MessageTypes.POSSIBLE_STATES_MSG;
+	}
+	
+	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID,
+			double[] possibleStates, double initState) {
+		super(srcIP, dstIP, srcID, dstID);
+		this.type = MessageTypes.POSSIBLE_STATES_MSG;
+		this.possibleStates = possibleStates;
+		this.initState = initState;
 	}
 	
 	public String toString() {
