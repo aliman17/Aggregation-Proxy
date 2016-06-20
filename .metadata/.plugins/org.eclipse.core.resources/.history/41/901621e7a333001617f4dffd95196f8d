@@ -1,0 +1,5 @@
+package publish.subscribe;
+
+public class AsyncReceiver {
+
+}

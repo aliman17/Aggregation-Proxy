@@ -1,0 +1,5 @@
+package publish.subscribe.string;
+
+public interface SenderInterface {
+	public void send(String stringMessage) throws Exception;
+}

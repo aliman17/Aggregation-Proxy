@@ -16,8 +16,9 @@ public class AsyncReceiver implements MessageListener {
     private MessageProtocol messageProtocol;
  
     static {
-        messageBrokerUrl = "tcp://localhost:61616";
-        messageQueueName = "client.messages";
+        //messageBrokerUrl = "tcp://196.176.106.171:61616";
+    	messageBrokerUrl = "tcp://localhost:61616";
+    	messageQueueName = "client.messages";
         ackMode = Session.AUTO_ACKNOWLEDGE;
     }
  
@@ -27,10 +28,12 @@ public class AsyncReceiver implements MessageListener {
             BrokerService broker = new BrokerService();
             broker.setPersistent(false);
             broker.setUseJmx(false);
-            broker.addConnector(messageBrokerUrl);
+            broker.addConnector("tcp://localhost:61616");  // Only localhost works
             broker.start();
+            System.out.println("Broker up");
         } catch (Exception e) {
             //Handle the exception appropriately
+        	System.out.println(e);
         }
  
         //Delegating the handling of messages to another class, instantiate it before setting up JMS so it
@@ -50,18 +53,20 @@ public class AsyncReceiver implements MessageListener {
  
             //Setup a message producer to respond to messages from clients, we will get the destination
             //to send to from the JMSReplyTo header field from a Message
-            this.replyProducer = this.session.createProducer(null);
-            this.replyProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            //this.replyProducer = this.session.createProducer(null);
+            //this.replyProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
  
             //Set up a consumer to consume messages off of the admin queue
             MessageConsumer consumer = this.session.createConsumer(adminQueue);
             consumer.setMessageListener(this);
         } catch (JMSException e) {
             //Handle the exception appropriately
+        	System.out.println(e);
         }
     }
  
     public void onMessage(Message message) {
+    	System.out.println("Ou, yeah, the message arrived");
         try {
             TextMessage response = this.session.createTextMessage();
             if (message instanceof TextMessage) {
@@ -77,7 +82,7 @@ public class AsyncReceiver implements MessageListener {
  
             //Send the response to the Destination specified by the JMSReplyTo field of the received message,
             //this is presumably a temporary queue created by the client
-            this.replyProducer.send(message.getJMSReplyTo(), response);
+            //this.replyProducer.send(message.getJMSReplyTo(), response);
         } catch (JMSException e) {
             //Handle the exception appropriately
         }

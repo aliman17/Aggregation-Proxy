@@ -1,0 +1,5 @@
+package publish.subscribe.string;
+
+public class Client {
+
+}

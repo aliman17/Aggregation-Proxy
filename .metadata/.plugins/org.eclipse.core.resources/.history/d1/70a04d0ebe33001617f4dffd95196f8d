@@ -1,0 +1,8 @@
+package publish.subscribe.string;
+
+import com.sun.xml.internal.ws.wsdl.writer.document.Port;
+
+public class TestConstants {
+	public static serverIP = "tcp://localhost";
+	public static Port = "61616";
+}

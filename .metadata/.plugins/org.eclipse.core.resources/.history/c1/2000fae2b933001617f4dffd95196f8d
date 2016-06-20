@@ -1,0 +1,6 @@
+package publish.subscribe.string;
+
+public interface ClientInterface {
+	public void sendPossibleStates();
+	public void sendSelectedState();
+}

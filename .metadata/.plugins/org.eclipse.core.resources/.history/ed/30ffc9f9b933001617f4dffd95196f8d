@@ -1,0 +1,17 @@
+package publish.subscribe.string;
+
+public class Client implements ClientInterface {
+
+	@Override
+	public void sendPossibleStates() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendSelectedState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

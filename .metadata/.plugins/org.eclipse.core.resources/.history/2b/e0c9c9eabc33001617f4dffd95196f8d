@@ -1,0 +1,43 @@
+package publish.subscribe.string;
+
+public class Client implements ClientInterface {
+	
+	private Sender sender;
+	private double[] possibleStates;
+	private double selectedState;
+	
+	public Client() {
+		// TODO Auto-generated constructor stub
+		sender = new Sender();
+		possibleStates = {1.0, 2.0, 3.0, 4.0};
+		selectedState = 1;
+	}
+	
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setPossibleStates(double[] possibleStates) {
+		this.possibleStates = possibleStates;		
+	}
+
+	@Override
+	public void setSelectedStates(double selectedState) {
+		this.selectedState = selectedState;
+	}
+
+	@Override
+	public void sendPossibleStates() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendSelectedState() {
+		// TODO Auto-generated method stub
+		
+	}
+}

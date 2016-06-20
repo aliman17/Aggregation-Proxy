@@ -1,0 +1,9 @@
+package publish.subscribe.string;
+
+public interface ClientInterface {
+	public void sendPossibleStates(String serverIP, String serverID);
+
+	public void sendSelectedState(String serverIP, String serverID);
+	
+	public void sendJson(String json, String serverIP, String serverID);
+}

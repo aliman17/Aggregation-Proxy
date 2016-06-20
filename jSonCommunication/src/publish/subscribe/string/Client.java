@@ -28,7 +28,6 @@ public class Client implements ClientInterface {
 	
 	@Override
 	public void start() {
-		// TODO Auto-generated method stub
 		this.sendPossibleStates();
 		this.sendSelectedState();
 	}
@@ -45,8 +44,7 @@ public class Client implements ClientInterface {
 
 	@Override
 	public void sendPossibleStates() {
-		// TODO convert possibleStates into Json format and then send it
-		// Now we send just some string
+		
 		PossibleStatesMessage posStMsg = 
 				new PossibleStatesMessage(
 						"ExampleSourceIP",
@@ -56,8 +54,8 @@ public class Client implements ClientInterface {
 						this.possibleStates, 
 						this.initState);
 		
-		String serverIP = TestConstants.serverIP;  	// Test
-		String port = TestConstants.port;			// Test
+		String serverIP = TestConstants.serverIP;  	// TODO: Test
+		String port = TestConstants.port;			// TODO: Test
 		
 		String stringMessage;
 		try {
@@ -77,9 +75,7 @@ public class Client implements ClientInterface {
 
 	@Override
 	public void sendSelectedState() {
-		// TODO convert possibleStates into Json format and then send it
-		// Now we send just some string
-		// Basic information
+		
 		SelectedStateMessage selStMsg = 
 				new SelectedStateMessage(
 						"ExampleSourceIP",
@@ -87,8 +83,8 @@ public class Client implements ClientInterface {
 						"ExampleSourceID",
 						"ExampleDestID"	);
 
-		String serverIP = TestConstants.serverIP;  	// Test
-		String port = TestConstants.port;			// Test
+		String serverIP = TestConstants.serverIP;  	// TODO: Test
+		String port = TestConstants.port;			// TODO: Test
 		
 		String stringMessage;
 		try {

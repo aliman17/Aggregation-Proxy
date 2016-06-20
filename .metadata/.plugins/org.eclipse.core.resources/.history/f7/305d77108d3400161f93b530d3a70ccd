@@ -1,0 +1,115 @@
+package publish.subscribe.string;
+
+import javax.jms.*;  // TODO, reduce this
+
+import java.util.Properties;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+import javax.jms.MessageListener;
+import javax.jms.JMSException;
+import javax.jms.ExceptionListener;
+import javax.jms.QueueSession;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+                                                                           
+public class AsyncReceiver2Broker implements MessageListener, ExceptionListener
+{
+	private static int ackMode;
+    private static String messageQueueName;
+    private static String messageBrokerUrl;
+ 
+    private Session session;
+    private boolean transacted = false;
+    private MessageProducer replyProducer;
+    //private MessageProtocol messageProtocol;
+ 
+    static {
+        messageBrokerUrl = "tcp://localhost:61616";
+        messageQueueName = "client.messages";
+        ackMode = Session.AUTO_ACKNOWLEDGE;
+    }
+ 
+    public AsyncReceiver2Broker() {
+        try {
+            //This message broker is embedded
+            BrokerService broker = new BrokerService();
+            broker.setPersistent(false);
+            broker.setUseJmx(false);
+            broker.addConnector(messageBrokerUrl);
+            broker.start();
+        } catch (Exception e) {
+            //Handle the exception appropriately
+        }
+ 
+        //Delegating the handling of messages to another class, instantiate it before setting up JMS so it
+        //is ready to handle messages
+        //this.messageProtocol = new MessageProtocol();
+        this.setupMessageQueueConsumer();
+    }
+ 
+    private void setupMessageQueueConsumer() {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(messageBrokerUrl);
+        Connection connection;
+        try {
+            connection = connectionFactory.createConnection();
+            connection.start();
+            this.session = connection.createSession(this.transacted, ackMode);
+            Destination adminQueue = this.session.createQueue(messageQueueName);
+ 
+            //Setup a message producer to respond to messages from clients, we will get the destination
+            //to send to from the JMSReplyTo header field from a Message
+            this.replyProducer = this.session.createProducer(null);
+            this.replyProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+ 
+            //Set up a consumer to consume messages off of the admin queue
+            MessageConsumer consumer = this.session.createConsumer(adminQueue);
+            consumer.setMessageListener(this);
+        } catch (JMSException e) {
+            //Handle the exception appropriately
+        }
+    }
+    
+                                                                           
+    /**
+       This method is called asynchronously by JMS when a message arrives
+       at the queue. Client applications must not throw any exceptions in
+       the onMessage method.
+       @param message A JMS message.
+     */
+    public void onMessage(Message message)
+    {
+       TextMessage msg = (TextMessage) message;
+       try {
+    	   if(msg.getText().equals("exit")){
+    		   //queueConn.close();
+    		   System.out.println("Application Exits");
+    	   }else{
+    		   System.out.println("received: " + msg.getText());
+    	   }
+       } catch (JMSException ex) {
+          ex.printStackTrace();
+       }
+    }
+                                                                           
+    /**
+       This method is called asynchronously by JMS when some error occurs.
+       When using an asynchronous message listener it is recommended to use
+       an exception listener also since JMS have no way to report errors
+       otherwise.
+       @param exception A JMS exception.
+     */
+    public void onException(JMSException exception)
+    {
+       System.err.println("an error occurred: " + exception);
+    }
+}
