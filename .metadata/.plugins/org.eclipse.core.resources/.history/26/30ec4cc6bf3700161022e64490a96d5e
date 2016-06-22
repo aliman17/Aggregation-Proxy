@@ -1,0 +1,6 @@
+serverIP=tcp://localhost
+serverID=ExampleServerID
+serverPort=61616
+
+clientQueueName=client.messages
+brokerUrl=tcp://localhost:61616

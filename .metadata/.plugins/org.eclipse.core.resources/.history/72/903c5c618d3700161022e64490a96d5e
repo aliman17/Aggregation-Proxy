@@ -1,0 +1,5 @@
+package publish.subscribe.parser;
+
+public class GetPropertyValues {
+
+}

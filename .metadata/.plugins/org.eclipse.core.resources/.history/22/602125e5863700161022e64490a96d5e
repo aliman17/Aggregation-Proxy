@@ -1,0 +1,76 @@
+package publish.subscribe.parser;
+
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.ActiveMQConnectionFactory;
+ 
+import javax.jms.*;
+ 
+public class AsyncReceiver implements MessageListener {
+    private static int ackMode;
+    private static String messageQueueName;
+    private static String messageBrokerUrl;
+ 
+    private Session session;
+    private boolean transacted = false;
+    private MessageProducer replyProducer;
+ 
+    static {
+        //messageBrokerUrl = "tcp://196.176.106.171:61616";
+    	messageBrokerUrl = "tcp://localhost:61616";
+    	messageQueueName = "client.messages";
+        ackMode = Session.AUTO_ACKNOWLEDGE;
+    }
+ 
+    public AsyncReceiver() {
+        try {
+            //This message broker is embedded
+            BrokerService broker = new BrokerService();
+            broker.setPersistent(false);
+            broker.setUseJmx(false);
+            broker.addConnector("tcp://localhost:61616");  // Only localhost works
+            broker.start();
+            System.out.println("Broker up");
+        } catch (Exception e) {
+            //Handle the exception appropriately
+        	System.out.println(e);
+        }
+ 
+        //Delegating the handling of messages to another class, instantiate it before setting up JMS so it
+        //is ready to handle messages
+        this.setupMessageQueueConsumer();
+    }
+ 
+    private void setupMessageQueueConsumer() {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(messageBrokerUrl);
+        Connection connection;
+        try {
+            connection = connectionFactory.createConnection();
+            connection.start();
+            this.session = connection.createSession(this.transacted, ackMode);
+            Destination adminQueue = this.session.createQueue(messageQueueName);
+ 
+            //Set up a consumer to consume messages off of the admin queue
+            MessageConsumer consumer = this.session.createConsumer(adminQueue);
+            consumer.setMessageListener(this);
+        } catch (JMSException e) {
+            //Handle the exception appropriately
+        	System.out.println(e);
+        }
+    }
+ 
+    public void onMessage(Message message) {
+    	System.out.println("Ou, yeah, the message arrived");
+    	TextMessage msg = (TextMessage) message;
+        try {
+     	   
+        	System.out.println("received: " + msg.getText());
+     	
+        } catch (JMSException ex) {
+           ex.printStackTrace();
+        }
+    }
+ 
+    public static void main(String[] args) {
+        new AsyncReceiver();
+    }
+}

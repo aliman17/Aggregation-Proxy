@@ -1,0 +1,5 @@
+package publish.subscribe.parser;
+
+public interface SenderInterface {
+	public void send(String stringMessage, String serverIP, String port) throws Exception;
+}

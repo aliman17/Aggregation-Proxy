@@ -1,0 +1,75 @@
+package publish.subscribe.parser;
+
+import java.net.Inet4Address;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+
+import json.node.CommunicationListener;
+import json.parser.JsonParserInterface;
+
+public class Server implements ServerInterface{
+	private AsyncReceiver asyncReceiver;
+	private JsonServerParserInterface parser;
+	private String serverIP;
+	private String serverID;
+	private String serverPort;
+	private String clientQueueName;
+	private String brokerUrl;
+	
+	private GetPropertyValues properties;
+	
+	public Server(){
+		try {
+			serverIP = getMyIp();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		
+		properties = new GetPropertyValues();
+		serverPort = properties.serverPort;
+		clientQueueName = properties.clientQueueName;
+		brokerUrl = serverIP + ":" + serverPort;
+		asyncReceiver = new AsyncReceiver(brokerUrl, clientQueueName);
+		parser = new JsonServerParser(this);
+	}
+
+	@Override
+	public void sendJson(String json, String clientIP) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getIP() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addListener(CommunicationListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public static String getMyIp() throws SocketException {
+
+		return Collections.list(
+				NetworkInterface.getNetworkInterfaces()).stream()
+				.flatMap(i -> Collections.list(i.getInetAddresses()).stream())
+				.filter(ip -> ip instanceof Inet4Address && ip.isSiteLocalAddress())
+				.findFirst().orElseThrow(RuntimeException::new).getHostAddress();
+	}
+}

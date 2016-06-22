@@ -14,8 +14,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.xpath.internal.axes.SelfIteratorNoPredicate;
-
 import json.messages.PossibleStatesMessage;
 import json.messages.SelectedStateMessage;
 import json.node.CommunicationListener;

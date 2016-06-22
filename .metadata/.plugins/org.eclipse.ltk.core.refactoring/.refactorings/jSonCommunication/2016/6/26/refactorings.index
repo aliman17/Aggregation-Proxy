@@ -1,0 +1,28 @@
+1466429505435	Rename type 'JsonServerParser'
+1466429606620	Copy compilation unit
+1466429641702	Copy compilation unit
+1466429688925	Delete element
+1466429699879	Delete element
+1466429775314	Copy compilation unit
+1466429813145	Delete element
+1466432245555	Copy compilation unit
+1466432257599	Rename type 'JsonServerInterface'
+1466432274682	Rename type 'JsonServerParser'
+1466494982690	Delete element
+1466494995923	Copy package
+1466495016962	Delete element
+1466495234022	Copy compilation units
+1466497857441	Rename type 'ServerParserInterface'
+1466497875771	Rename type 'ServerParser'
+1466498485550	Rename resource 'Resources'
+1466500314813	Delete element
+1466511841723	Rename type 'AsyncReceiver'
+1466511905698	Rename type 'GetPropertyValues'
+1466512108378	Rename type 'Sender'
+1466512141079	Rename type 'SenderInterface'
+1466512156694	Delete element
+1466512186055	Rename type 'AsyncServerListener'
+1466523069058	Copy package
+1466601740104	Copy package
+1466601893921	Copy package
+1466601991067	Copy package

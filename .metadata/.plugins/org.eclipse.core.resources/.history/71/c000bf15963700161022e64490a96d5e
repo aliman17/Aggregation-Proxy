@@ -1,0 +1,3 @@
+serverIP=tcp://localhost
+serverID=ExampleServerID
+serverPort=61616

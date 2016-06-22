@@ -1,0 +1,17 @@
+package publish.subscribe.string;
+
+import json.parser.JsonParserInterface;
+
+public class Server implements ServerInterface{
+	private AsyncReceiver asyncReceiver;
+	private JsonParserInterface parser;
+	private String myIPaddress;
+	private String myID;
+	
+	public Server(){
+		myID = "ExampleServerID";
+		myIPaddress = "ExampleServerIP";
+		asyncReceiver = new AsyncReceiver();
+		parser = new ServerParser(this);
+	}
+}
