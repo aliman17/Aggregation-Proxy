@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import flexjson.JSONSerializer;
+import json.WriteJSON;
 import json.messages.BaseMessage;
 import json.messages.PossibleStatesMessage;
 import json.messages.SelectedStateMessage;
@@ -59,28 +60,22 @@ public class State {
 		return this.selectedState;
 	}
 
-	public String possibleStatesToString() {
+	public String getPossibleStatesMessage() {
 
 		PossibleStatesMessage posStMsg = new PossibleStatesMessage(
 				this.clientIP, this.serverIP, this.clientID,
 				this.serverID, this.possibleStates, this.initState);
 
-		return objectToString(posStMsg);
+		return WriteJSON.serialize(posStMsg);
 	}
 
-	public String selectedStateToString() {
+	public String getSelectedStateMessage() {
 
 		SelectedStateMessage selStMsg = new SelectedStateMessage(
 				this.clientIP, this.serverIP, this.clientID,
 				this.serverID, this.selectedState);
 
-		return objectToString(selStMsg);
-	}
-
-	public static String objectToString(BaseMessage messageObj) {
-		JSONSerializer serializer = new JSONSerializer();
-		String flexJsonString = serializer.serialize(messageObj);
-		return flexJsonString;
+		return WriteJSON.serialize(selStMsg);
 	}
 
 	public static String getMyIp() {

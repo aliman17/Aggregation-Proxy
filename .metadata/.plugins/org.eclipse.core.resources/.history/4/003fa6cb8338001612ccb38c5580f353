@@ -65,9 +65,8 @@ class ServerListener implements Runnable {
 				            new InputStreamReader(socket.getInputStream()));
 					
 				String msg;
-				while(true){
+				while(in.ready()){
 					msg = in.readLine();
-					if(msg == null) break;
 					BaseMessage bmsg = ReadJSON.deserialize(msg);
 					System.out.println(bmsg.toString());
 				}

@@ -61,8 +61,8 @@ public class Client extends Activity {
                     MyClientTask myClientTask = new MyClientTask(
                             //editTextAddress.getText().toString(),
                             //Integer.parseInt(editTextPort.getText().toString())
-                            "10.3.24.255",
-                            8080 );
+                            "10.3.24.255", // TODO
+                            8080 );        // TODO
                     myClientTask.execute();
                 }};
 
@@ -87,9 +87,12 @@ public class Client extends Activity {
                 PrintWriter out =
                         new PrintWriter(socket.getOutputStream(), true);
 
-                String sendString = state.possibleStatesToString();
-                out.println(sendString);
+                //debug state.setPossibleStates(new double[]{1,1,2,2,3,5,4,6});
+                String psm = state.getPossibleStatesMessage();
+                out.println(psm);
 
+                String ssm = state.getSelectedStateMessage();
+                out.println(ssm);
 
             } catch (UnknownHostException e) {
                 // TODO Auto-generated catch block
