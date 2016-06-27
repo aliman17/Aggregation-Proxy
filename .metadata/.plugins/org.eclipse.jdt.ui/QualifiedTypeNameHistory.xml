@@ -30,10 +30,17 @@
 <fullyQualifiedTypeName name="javax.jms.Message"/>
 <fullyQualifiedTypeName name="javax.jms.TextMessage"/>
 <fullyQualifiedTypeName name="publish.subscribe.parser.GetPropertyValues"/>
-<fullyQualifiedTypeName name="java.lang.String"/>
 <fullyQualifiedTypeName name="publish.subscribe.parser.Server"/>
 <fullyQualifiedTypeName name="java.net.InetAddress"/>
 <fullyQualifiedTypeName name="java.net.UnknownHostException"/>
 <fullyQualifiedTypeName name="publish.subscribe.parser.ServerInterface"/>
+<fullyQualifiedTypeName name="java.io.BufferedReader"/>
+<fullyQualifiedTypeName name="java.io.InputStreamReader"/>
+<fullyQualifiedTypeName name="flexjson.JSONDeserializer"/>
+<fullyQualifiedTypeName name="java.lang.BootstrapMethodError"/>
+<fullyQualifiedTypeName name="json.ReadJSON"/>
+<fullyQualifiedTypeName name="json.messages.BaseMessage"/>
 <fullyQualifiedTypeName name="java.lang.System"/>
+<fullyQualifiedTypeName name="java.lang.String"/>
+<fullyQualifiedTypeName name="java.io.Serializable"/>
 </qualifiedTypeNameHistroy>

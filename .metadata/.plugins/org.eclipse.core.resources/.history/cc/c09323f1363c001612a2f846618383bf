@@ -1,7 +1,5 @@
 package json;
 
-import org.omg.PortableServer.ImplicitActivationPolicyOperations;
-
 import flexjson.JSONDeserializer;
 import json.messages.BaseMessage;
 
@@ -12,5 +10,4 @@ public class ReadJSON {
 				.deserialize(flexJson);
 		return msg;
 	}
-	
 }

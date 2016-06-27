@@ -32,7 +32,7 @@ public class Client extends Activity {
         setContentView(R.layout.activity_client);
 
         // Initialize state
-        state = new State();
+        state = new State(this);
 
         // Store element on the view in arguments
         editTextAddress = (EditText)findViewById(R.id.address);
@@ -51,6 +51,8 @@ public class Client extends Activity {
             public void onClick(View v) {
                 textResponse.setText("");
             }});
+
+
     }
 
     OnClickListener buttonConnectOnClickListener =

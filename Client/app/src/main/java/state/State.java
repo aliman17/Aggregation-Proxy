@@ -1,10 +1,18 @@
 package state;
 
+import android.content.Context;
+import android.util.Log;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import clustering.Cluster;
+import clustering.KMeans;
+import clustering.Point;
+import database.DatabaseHandler;
 import flexjson.JSONSerializer;
 import json.WriteJSON;
 import json.messages.BaseMessage;
@@ -26,8 +34,8 @@ public class State {
 
 	private double selectedState;
 
-	public State() {
-		// Get client's IP address
+	public State(Context context) {
+		// TODO Get client's IP address
 		clientIP = getMyIp();
 		clientID = "ExampleClientID";
 		serverIP = "localhost";
@@ -35,13 +43,32 @@ public class State {
 		serverPort = 8080;
 
 		// TODO: Set states
-		possibleStates = new double[4];
-		possibleStates[0] = 1;
-		possibleStates[1] = 2;
-		possibleStates[2] = 3;
-		possibleStates[3] = 4;
+		//possibleStates = new double[4];
+		//possibleStates[0] = 1;
+		//possibleStates[1] = 2;
+		//possibleStates[2] = 3;
+		//possibleStates[3] = 4;
 		initState = 1;
 		selectedState = 2;
+		initPossibleStates(context);
+	}
+
+	private void initPossibleStates(Context context){
+		// Creating database and table
+		DatabaseHandler db = new DatabaseHandler(context);
+		ArrayList<Double> sensorValues = db.getAllSensorValues();
+		ArrayList<Point> points = new ArrayList<>();
+		for( Double d : sensorValues ) {
+			points.add(new Point(d));
+		}
+
+		KMeans kmeans = new KMeans(points);
+		kmeans.calculate();
+		int len = kmeans.clusters.size();
+		possibleStates = new double[len];
+		for( int i = 0; i < len; i++ ) {
+			possibleStates[i] = kmeans.clusters.get(i).centroid.getX();
+		}
 	}
 
 	public void setPossibleStates(double[] possibleStates) {
