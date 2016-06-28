@@ -1,7 +1,6 @@
 package state;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -9,15 +8,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import clustering.Cluster;
 import clustering.KMeans;
 import clustering.Point;
 import database.DatabaseHandler;
-import flexjson.JSONSerializer;
 import json.WriteJSON;
-import json.messages.BaseMessage;
 import json.messages.PossibleStatesMessage;
 import json.messages.SelectedStateMessage;
+
+
 
 public class State {
 
@@ -51,6 +49,12 @@ public class State {
 		initState = 1;
 		selectedState = 2;
 		initPossibleStates(context);
+	}
+
+
+
+	private void initPossibleStatesNervousnet(){
+		//NervousnetRemote;
 	}
 
 	private void initPossibleStates(Context context){
