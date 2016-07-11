@@ -3,10 +3,9 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
-
     defaultConfig {
         applicationId "ethz.ch.client"
-        minSdkVersion 8
+        minSdkVersion 21
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -17,6 +16,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
@@ -25,4 +26,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile files('libs/flexjson-2.1.jar')
     compile files('libs/android-support-v4.jar')
+    //compile project(path: ':nervousnetLIB')
+    //compile project(path: ':nervousnetLIBAndrStudio')
+    compile 'ch.ethz.coss.nervousnet:nervousnetLIB:0.7.9'
 }

@@ -43,4 +43,6 @@
 <fullyQualifiedTypeName name="java.lang.System"/>
 <fullyQualifiedTypeName name="java.lang.String"/>
 <fullyQualifiedTypeName name="java.io.Serializable"/>
+<fullyQualifiedTypeName name="org.omg.PortableServer.ImplicitActivationPolicyOperations"/>
+<fullyQualifiedTypeName name="flexjson.JSON"/>
 </qualifiedTypeNameHistroy>

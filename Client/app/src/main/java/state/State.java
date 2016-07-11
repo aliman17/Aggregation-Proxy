@@ -8,13 +8,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import clustering.KMeans;
+import clustering.Cluster;
+import clustering.Clustering;
+import clustering.KMeans_first_example;
 import clustering.Point;
 import database.DatabaseHandler;
 import json.WriteJSON;
 import json.messages.PossibleStatesMessage;
 import json.messages.SelectedStateMessage;
-
+import nervousnet.Nervousnet;
 
 
 public class State {
@@ -49,12 +51,12 @@ public class State {
 		initState = 1;
 		selectedState = 2;
 		initPossibleStates(context);
+		initPossibleStatesNervousnet(context);
 	}
 
-
-
-	private void initPossibleStatesNervousnet(){
-		//NervousnetRemote;
+	private void initPossibleStatesNervousnet(Context context){
+		Nervousnet n = new Nervousnet(context);
+		n.test();
 	}
 
 	private void initPossibleStates(Context context){
@@ -66,12 +68,13 @@ public class State {
 			points.add(new Point(d));
 		}
 
-		KMeans kmeans = new KMeans(points);
-		kmeans.calculate();
-		int len = kmeans.clusters.size();
+		Clustering clustering = new KMeans_first_example();
+		clustering.compute(points);
+		List<Cluster> clusters = clustering.getClusters();
+		int len = clusters.size();
 		possibleStates = new double[len];
 		for( int i = 0; i < len; i++ ) {
-			possibleStates[i] = kmeans.clusters.get(i).centroid.getX();
+			possibleStates[i] = clusters.get(i).centroid.getX();
 		}
 	}
 

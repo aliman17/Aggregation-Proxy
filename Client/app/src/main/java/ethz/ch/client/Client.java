@@ -1,8 +1,12 @@
 package ethz.ch.client;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -22,6 +26,8 @@ public class Client extends Activity {
     EditText editTextAddress, editTextPort;
     Button buttonConnect, buttonClear;
 
+    OnClickListener buttonConnectOnClickListener;
+
     State state;
 
     @Override
@@ -31,42 +37,43 @@ public class Client extends Activity {
         // Create front-end view
         setContentView(R.layout.activity_client);
 
-        // Initialize state
+        // Initialize state of the client
         state = new State(this);
 
         // Store element on the view in arguments
-        editTextAddress = (EditText)findViewById(R.id.address);
-        editTextPort = (EditText)findViewById(R.id.port);
         buttonConnect = (Button)findViewById(R.id.connect);
-        buttonClear = (Button)findViewById(R.id.clear);
         textResponse = (TextView)findViewById(R.id.response);
 
         // Create button handler for Connect
+        initButtonConnectOnClickListener(this);
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
-
-        // Create button handler for Clear
-        buttonClear.setOnClickListener(new OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                textResponse.setText("");
-            }});
-
-
     }
 
-    OnClickListener buttonConnectOnClickListener =
-            new OnClickListener(){
+    protected void initButtonConnectOnClickListener(Context context) {
 
-                @Override
-                public void onClick(View arg0) {
-                    MyClientTask myClientTask = new MyClientTask(
-                            //editTextAddress.getText().toString(),
-                            //Integer.parseInt(editTextPort.getText().toString())
-                            "10.3.24.255", // TODO
-                            8080 );        // TODO
-                    myClientTask.execute();
-                }};
+        // Read manifest file to get server's url and port
+        final String dstAddress = "server_url";
+        final String dstPort = "server_port";
+
+        ApplicationInfo ai = null;
+        try {
+            ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        final Bundle bundle = ai.metaData;
+
+        // Create button connector
+        this.buttonConnectOnClickListener = new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                MyClientTask myClientTask = new MyClientTask(
+                        bundle.getString(dstAddress),
+                        bundle.getInt(dstPort));
+                myClientTask.execute();
+            }
+        };
+    }
 
     public class MyClientTask extends AsyncTask<Void, Void, Void> {
 
@@ -84,38 +91,36 @@ public class Client extends Activity {
             Socket socket = null;
 
             try {
+                // Create new socket
                 socket = new Socket(dstAddress, dstPort);
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                PrintWriter out =
-                        new PrintWriter(socket.getOutputStream(), true);
-
-                //debug state.setPossibleStates(new double[]{1,1,2,2,3,5,4,6});
+                // Send possible states
                 String psm = state.getPossibleStatesMessage();
                 out.println(psm);
 
+                // Send selected state
                 String ssm = state.getSelectedStateMessage();
                 out.println(ssm);
 
+                response = "Sent";
             } catch (UnknownHostException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                response = "UnknownHostException: " + e.toString();
+                response = "Unknown host";
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                response = "IOException: " + e.toString();
+                response = "IOException";
             }finally{
                 if(socket != null){
                     try {
                         socket.close();
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
             }
-
-            response = "Sent";
             return null;
         }
 

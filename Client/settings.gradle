@@ -1,1 +1,2 @@
-include ':app'
+include ':app'//, ':nervousnetLIBAndrStudio'
+//project(':nervousnetLIBAndrStudio').projectDir = new File('libs/nervousnetLIBAndrStudio')
