@@ -29,6 +29,7 @@ public class State {
 
 	private String serverID;
 
+	public ArrayList<Double> sensorValues;
 	private double[] possibleStates;
 	private double initState;
 
@@ -62,7 +63,7 @@ public class State {
 	private void initPossibleStates(Context context){
 		// Creating database and table
 		DatabaseHandler db = new DatabaseHandler(context);
-		ArrayList<Double> sensorValues = db.getAllSensorValues();
+		sensorValues = db.getAllSensorValues();
 		ArrayList<Point> points = new ArrayList<>();
 		for( Double d : sensorValues ) {
 			points.add(new Point(d));
