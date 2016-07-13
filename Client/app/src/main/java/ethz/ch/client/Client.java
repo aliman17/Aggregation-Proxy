@@ -57,10 +57,12 @@ import state.State;
 public class Client extends Activity {
     String response = "";
     TextView textResponse;
+    TextView textNervousnet;
     EditText editTextAddress, editTextPort;
-    Button buttonConnect, buttonClear;
+    Button buttonConnect, buttonNervousnet;
 
     OnClickListener buttonConnectOnClickListener;
+    OnClickListener buttonNervousnetOnClickListener;
 
     State state;
 
@@ -77,11 +79,16 @@ public class Client extends Activity {
 
         // Store element on the view in arguments
         buttonConnect = (Button)findViewById(R.id.connect);
-        textResponse = (TextView)findViewById(R.id.response);
+        buttonNervousnet = (Button)findViewById(R.id.nervousnet);
 
-        // Create button handler for Connect
+        textResponse = (TextView)findViewById(R.id.response);
+        textNervousnet = (TextView)findViewById(R.id.textNervousnet);
+
         initButtonConnectOnClickListener(this);
+        initButtonNervousnet(this);
+
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
+        buttonNervousnet.setOnClickListener(buttonNervousnetOnClickListener);
 
         // Get sensors data
         Nervousnet nervousnet = new Nervousnet(this);
@@ -174,70 +181,26 @@ public class Client extends Activity {
             @Override
             public void onClick(View arg0) {
                 SendStates myClientTask = new SendStates(
+                        textResponse,
                         bundle.getString(dstAddress),
-                        bundle.getInt(dstPort));
+                        bundle.getInt(dstPort),
+                        state);
                 myClientTask.execute();
             }
         };
     }
 
-    public class SendStates extends AsyncTask<Void, Void, Void> {
-
-        String dstAddress;
-        int dstPort;
-
-        SendStates(String addr, int port){
-            dstAddress = addr;
-            dstPort = port;
-        }
-
-        @Override
-        protected Void doInBackground(Void... arg0) {
-
-            Socket socket = null;
-
-            try {
-                // Create new socket
-                socket = new Socket(dstAddress, dstPort);
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-                // Send possible states
-                String psm = state.getPossibleStatesMessage();
-                out.println(psm);
-
-                // Send selected state
-                String ssm = state.getSelectedStateMessage();
-                out.println(ssm);
-
-                response = "Sent";
-            } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                response = "Unknown host";
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                response = "IOException";
-            }finally{
-                if(socket != null){
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+    protected void initButtonNervousnet(final Context context) {
+        // Create button connector
+        this.buttonNervousnetOnClickListener = new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                NervousnetButtonHandler myClientTask = new NervousnetButtonHandler(
+                        textNervousnet, new Nervousnet(context));
+                myClientTask.execute();
             }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            textResponse.setText(response);
-            super.onPostExecute(result);
-        }
-
+        };
     }
-
 
 
 }

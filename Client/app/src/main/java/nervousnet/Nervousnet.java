@@ -31,10 +31,10 @@ public class Nervousnet {
 
     public Nervousnet(Context context){
         this.context = context;
-        initConnection();
-        doBindService();
-        Toast.makeText(context.getApplicationContext(),
-                "NervousnetRemote Service connected " + mService, Toast.LENGTH_SHORT).show();
+        //initConnection();
+        //doBindService();
+        //Toast.makeText(context.getApplicationContext(),
+        //        "NervousnetRemote Service connected " + mService, Toast.LENGTH_SHORT).show();
     }
 
     public void initConnection(){
@@ -86,6 +86,10 @@ public class Nervousnet {
 
     // TODO: this is basic function, to return some example data
     public ArrayList<Double> getLightData(){
-        return null;
+        ArrayList<Double> array = new ArrayList<Double>();
+        array.add(new Double(12));
+        array.add(new Double(14));
+        array.add(new Double(18));
+        return array;
     }
 }
