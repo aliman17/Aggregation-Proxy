@@ -5,7 +5,6 @@ package clustering;
  */
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class KMeans_first_example implements Clustering{
 
@@ -18,15 +17,16 @@ public class KMeans_first_example implements Clustering{
 
     public KMeans_first_example() {
         this.clusters = new ArrayList();
+        this.init();
         //plotClusters();
     }
 
-    private void init(List<Point> points){
+    private void init(){
         //Create Clusters
         //Set Random Centroids
         for (int i = 0; i < NUM_CLUSTERS; i++) {
             Cluster cluster = new Cluster(i);
-            Point centroid = points.get(Random.)
+            Point centroid = Point.createRandomPoint(MIN_COORDINATE,MAX_COORDINATE);
             cluster.setCentroid(centroid);
             clusters.add(cluster);
         }
@@ -34,9 +34,6 @@ public class KMeans_first_example implements Clustering{
 
     //The process to calculate the K Means, with iterating method.
     public void compute(List<Point> points) {
-
-        this.init(points);
-
         boolean finish = false;
         int iteration = 0;
 

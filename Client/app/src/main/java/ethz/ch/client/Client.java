@@ -1,9 +1,15 @@
 package ethz.ch.client;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.DeadObjectException;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -33,8 +39,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
+import ch.ethz.coss.nervousnet.lib.LibConstants;
+import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
+import clustering.Cluster;
+import clustering.Clustering;
+import clustering.KMeans_first_example;
+import clustering.Point;
+import database.DatabaseHandler;
+import nervousnet.Nervousnet;
 import state.State;
 
 public class Client extends Activity {
@@ -47,15 +64,16 @@ public class Client extends Activity {
 
     State state;
 
+    protected NervousnetRemote mService;
+    private ServiceConnection mServiceConnection;
+    private Boolean bindFlag;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Create front-end view
         setContentView(R.layout.activity_client);
-
-        // Initialize state of the client
-        state = new State(this);
 
         // Store element on the view in arguments
         buttonConnect = (Button)findViewById(R.id.connect);
@@ -65,8 +83,36 @@ public class Client extends Activity {
         initButtonConnectOnClickListener(this);
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
 
+        // Get sensors data
+        Nervousnet nervousnet = new Nervousnet(this);
 
-        // PLOT
+
+        // Initialize state of the client
+        //state = new State(this);
+
+
+/*
+        private void initPossibleStates(Context context){
+            // Creating database and table
+            DatabaseHandler db = new DatabaseHandler(context);
+            sensorValues = db.getAllSensorValues();
+            ArrayList<Point> points = new ArrayList<>();
+            for( Double d : sensorValues ) {
+                points.add(new Point(d));
+            }
+
+            Clustering clustering = new KMeans_first_example();
+            clustering.compute(points);
+            List<Cluster> clusters = clustering.getClusters();
+            int len = clusters.size();
+            possibleStates = new double[len];
+            for( int i = 0; i < len; i++ ) {
+                possibleStates[i] = clusters.get(i).centroid.getX();
+            }
+        }
+        */
+
+        /*// PLOT
         GraphView point_graph = (GraphView) findViewById(R.id.graph);
 
         DataPoint[] data = new DataPoint[state.sensorValues.size()];
@@ -102,8 +148,10 @@ public class Client extends Activity {
                 Toast.makeText(Client.this, "Series1: On Data Point clicked: " + dataPoint, Toast.LENGTH_SHORT).show();
             }
         });
+        */
+        //Log.d("PossibleStates", Arrays.toString(possibleStates));
 
-        Log.d("PossibleStates", Arrays.toString(possibleStates));
+
 
     }
 
@@ -125,7 +173,7 @@ public class Client extends Activity {
         this.buttonConnectOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                MyClientTask myClientTask = new MyClientTask(
+                SendStates myClientTask = new SendStates(
                         bundle.getString(dstAddress),
                         bundle.getInt(dstPort));
                 myClientTask.execute();
@@ -133,12 +181,12 @@ public class Client extends Activity {
         };
     }
 
-    public class MyClientTask extends AsyncTask<Void, Void, Void> {
+    public class SendStates extends AsyncTask<Void, Void, Void> {
 
         String dstAddress;
         int dstPort;
 
-        MyClientTask(String addr, int port){
+        SendStates(String addr, int port){
             dstAddress = addr;
             dstPort = port;
         }
@@ -189,5 +237,7 @@ public class Client extends Activity {
         }
 
     }
+
+
 
 }

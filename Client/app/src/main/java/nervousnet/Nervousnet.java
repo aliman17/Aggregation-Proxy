@@ -8,6 +8,9 @@ import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
@@ -24,23 +27,47 @@ public class Nervousnet {
     private ServiceConnection mServiceConnection;
     private Boolean bindFlag;
 
+    private ArrayList<Double> lightData;
+
     public Nervousnet(Context context){
         this.context = context;
         initConnection();
+        doBindService();
+        Toast.makeText(context.getApplicationContext(),
+                "NervousnetRemote Service connected " + mService, Toast.LENGTH_SHORT).show();
     }
 
     public void initConnection(){
         mServiceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder service) {
-                Log.d("IT COMES HERE", "");
                 mService = NervousnetRemote.Stub.asInterface(service);
+                Toast.makeText(context.getApplicationContext(),
+                        "NervousnetRemote Service connected", Toast.LENGTH_SHORT).show();
+
+                // Example
+                AccelerometerReading lReading = null;
+                try {
+                    lReading = (AccelerometerReading) mService.getReading(LibConstants.SENSOR_ACCELEROMETER);
+                    if (lReading != null) {
+                        Log.d("Light", ""+lReading.getX() + " " + mService);
+                    } else {
+                        Log.d("Light object is null", "");
+                    }
+                } catch (DeadObjectException doe) {
+                    // TODO Auto-generated catch block
+                    doe.printStackTrace();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 mService = null;
                 mServiceConnection = null;
+                Toast.makeText(context.getApplicationContext(),
+                        "NervousnetRemote Service disconnected", Toast.LENGTH_SHORT).show();
             }
         };
     }
@@ -48,8 +75,8 @@ public class Nervousnet {
     public void doBindService(){
         Intent it = new Intent();
         it.setClassName("ch.ethz.coss.nervousnet.hub", "ch.ethz.coss.nervousnet.hub.NervousnetHubApiService");
-        bindFlag = context.bindService(it, mServiceConnection, 0);
-        Log.d("Nervousnet", "mService:"+mService + " bindFlag:"+bindFlag);
+        if (mService == null)
+            bindFlag = context.bindService(it, mServiceConnection, 0);
     }
 
     public void doUnbindService(){
@@ -57,36 +84,8 @@ public class Nervousnet {
         bindFlag = false;
     }
 
-
-    public void test(){
-        if (mServiceConnection == null) {
-            initConnection();
-        }
-
-        if (mService == null) {
-            doBindService();
-            /*try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            AccelerometerReading lReading = null;
-            try {
-                lReading = (AccelerometerReading) mService.getReading(LibConstants.SENSOR_ACCELEROMETER);
-                if (lReading != null) {
-                    Log.d("Light", ""+lReading.getX());
-                } else {
-                    Log.d("Light object is null", "");
-                }
-            } catch (DeadObjectException doe) {
-                // TODO Auto-generated catch block
-                doe.printStackTrace();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }*/
-        } else {
-            Log.d("", "mService is NULL");
-        }
-
+    // TODO: this is basic function, to return some example data
+    public ArrayList<Double> getLightData(){
+        return null;
     }
 }
