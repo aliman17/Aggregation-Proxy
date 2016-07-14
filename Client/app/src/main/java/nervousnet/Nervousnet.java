@@ -2,8 +2,10 @@ package nervousnet;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -16,6 +18,8 @@ import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
 import ch.ethz.coss.nervousnet.lib.LightReading;
 import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
+import ch.ethz.coss.nervousnet.lib.Utils;
+import ethz.ch.client.Client;
 
 /**
  * Created by ales on 28/06/16.
@@ -36,10 +40,13 @@ public class Nervousnet {
     // Constructor
     public Nervousnet(Context context){
         this.context = context;
+    }
+
+    // RUN THIS
+    public void connect(){
         initConnection();
         doBindService();
     }
-
 
     // 1) Initialize connection
     public void initConnection(){
@@ -49,22 +56,6 @@ public class Nervousnet {
                 mService = NervousnetRemote.Stub.asInterface(service);
                 Toast.makeText(context.getApplicationContext(),
                         "NervousnetRemote Service connected", Toast.LENGTH_SHORT).show();
-
-                // Example
-                AccelerometerReading lReading = null;
-                try {
-                    lReading = (AccelerometerReading) mService.getReading(LibConstants.SENSOR_ACCELEROMETER);
-                    if (lReading != null) {
-                        Log.d("Light", ""+lReading.getX() + " " + mService);
-                    } else {
-                        Log.d("Light object is null", "");
-                    }
-                } catch (DeadObjectException doe) {
-                    // TODO Auto-generated catch block
-                    doe.printStackTrace();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
             }
 
             @Override
@@ -80,7 +71,8 @@ public class Nervousnet {
     // 2) Bind service to the mService
     public void doBindService(){
         Intent it = new Intent();
-        it.setClassName("ch.ethz.coss.nervousnet.hub", "ch.ethz.coss.nervousnet.hub.NervousnetHubApiService");
+        it.setClassName("ch.ethz.coss.nervousnet.hub",
+                "ch.ethz.coss.nervousnet.hub.NervousnetHubApiService");
         if (mService == null)
             bindFlag = context.bindService(it, mServiceConnection, 0);
     }
@@ -91,12 +83,94 @@ public class Nervousnet {
         bindFlag = false;
     }
 
-    // TODO: this is basic function, to return some example data
-    public ArrayList<Double> getLightData(){
-        ArrayList<Double> array = new ArrayList<Double>();
-        array.add(new Double(12));
-        array.add(new Double(14));
-        array.add(new Double(18));
+    public void checkBinding(){
+        if (!bindFlag){
+            Utils.displayAlert(context, "Alert",
+                    "Nervousnet HUB application is required to be installed and running to use " +
+                            "this app. If not installed please download it from the App Store. " +
+                            "If already installed, please turn on the Data Collection option " +
+                            "inside the Nervousnet HUB application.",
+                    "Download Now", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            try {
+                                context.startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse("market://details?id=ch.ethz.coss.nervousnet.hub")));
+                            } catch (android.content.ActivityNotFoundException anfe) {
+                                context.startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse("https://play.google.com/store/apps/details?id=ch.ethz.coss.nervousnet.hub")));
+                            }
+
+                        }
+                    }, "Exit", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            System.exit(0);
+                        }
+                    });
+        }
+    }
+
+    public float getLightValue(){
+        AccelerometerReading lReading = null;
+        try {
+            lReading = (AccelerometerReading) mService.getReading(LibConstants.SENSOR_ACCELEROMETER);
+            if (lReading != null) {
+                Log.d("Nervousnet", "Light=" + lReading.getX());
+                return lReading.getX();
+            } else {
+                Log.d("Light object is null", "");
+            }
+        } catch (DeadObjectException doe) {
+            // TODO Auto-generated catch block
+            doe.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public double[] getLightValues(int n){
+
+        if (mServiceConnection == null) initConnection();
+        if (mService == null) doBindService();
+
+        // If binding is not ok, this function will handle it
+        checkBinding();
+
+        double[] array = new double[n];
+
+        if (mService != null) {
+            // Example
+            for(int i = 0; i < 10; i++){
+                Float fl = new Float(getLightValue());
+                array[i] = fl.doubleValue();
+            }
+        } else {
+            Toast.makeText(context.getApplicationContext(),
+                    "NervousnetRemote Service not connected", Toast.LENGTH_SHORT).show();
+        }
+
         return array;
     }
+
+    public double[] getLightValues(long startTimeEpoch, long endTimeEpoch){
+
+        checkBinding();
+        ArrayList<Double> values = new ArrayList();
+        try {
+            mService.getReadings(LibConstants.SENSOR_NOISE, startTimeEpoch, endTimeEpoch, values);
+        } catch (DeadObjectException doe) {
+            doe.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        // Convert to double[]
+        int nValues = values.size();
+        double[] dValues = new double[nValues];
+        for (int i = 0; i < nValues; i++)
+            dValues[i] = values.get(i);
+        return dValues;
+    }
+
+
 }

@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
 import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
@@ -29,7 +31,7 @@ import state.State;
 
 public class Client extends Activity {
     String response = "";
-    TextView textResponse;
+    TextView sendResponse;
     TextView textNervousnet;
     EditText editTextAddress, editTextPort;
     Button buttonConnect, buttonNervousnet;
@@ -56,7 +58,7 @@ public class Client extends Activity {
         buttonConnect = (Button)findViewById(R.id.connect);
         buttonNervousnet = (Button)findViewById(R.id.nervousnet);
 
-        textResponse = (TextView)findViewById(R.id.response);
+        sendResponse = (TextView)findViewById(R.id.sendResponse);
         textNervousnet = (TextView)findViewById(R.id.textNervousnet);
 
         initButtonConnectOnClickListener(this);
@@ -67,10 +69,10 @@ public class Client extends Activity {
 
         // Get sensors data
         nervousnet = new Nervousnet(this);
-
+        nervousnet.connect();
 
         // Initialize state of the client
-        //state = new State(this);
+        state = new State(this);
 
 
 /*
@@ -155,7 +157,7 @@ public class Client extends Activity {
             @Override
             public void onClick(View arg0) {
                 SendStatesButtonHandler myClientTask = new SendStatesButtonHandler(
-                        textResponse,
+                        sendResponse,
                         bundle.getString(dstAddress),
                         bundle.getInt(dstPort),
                         state);
@@ -169,8 +171,9 @@ public class Client extends Activity {
         this.buttonNervousnetOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                sendResponse.setText("Collecting data ...");
                 NervousnetButtonHandler myClientTask = new NervousnetButtonHandler(
-                        textNervousnet, nervousnet);
+                        textNervousnet, nervousnet, state, sendResponse);
                 myClientTask.execute();
             }
         };
