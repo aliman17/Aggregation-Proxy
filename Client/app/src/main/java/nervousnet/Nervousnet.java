@@ -21,22 +21,27 @@ import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
  * Created by ales on 28/06/16.
  */
 public class Nervousnet {
+
+    // We need context to get connections and sensor data
     private Context context;
 
+    // Connection to the service
     protected NervousnetRemote mService;
-    private ServiceConnection mServiceConnection;
-    private Boolean bindFlag;
+    private   ServiceConnection mServiceConnection;
+    private   Boolean bindFlag;
 
+    // Data
     private ArrayList<Double> lightData;
 
+    // Constructor
     public Nervousnet(Context context){
         this.context = context;
-        //initConnection();
-        //doBindService();
-        //Toast.makeText(context.getApplicationContext(),
-        //        "NervousnetRemote Service connected " + mService, Toast.LENGTH_SHORT).show();
+        initConnection();
+        doBindService();
     }
 
+
+    // 1) Initialize connection
     public void initConnection(){
         mServiceConnection = new ServiceConnection() {
             @Override
@@ -72,6 +77,7 @@ public class Nervousnet {
         };
     }
 
+    // 2) Bind service to the mService
     public void doBindService(){
         Intent it = new Intent();
         it.setClassName("ch.ethz.coss.nervousnet.hub", "ch.ethz.coss.nervousnet.hub.NervousnetHubApiService");
@@ -79,6 +85,7 @@ public class Nervousnet {
             bindFlag = context.bindService(it, mServiceConnection, 0);
     }
 
+    // 3) Unbind service when needed
     public void doUnbindService(){
         context.unbindService(mServiceConnection);
         bindFlag = false;

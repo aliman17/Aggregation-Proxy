@@ -5,15 +5,22 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.List;
 
+import json.WriteJSON;
+import json.messages.PossibleStatesMessage;
+import json.messages.SelectedStateMessage;
 import state.State;
 
 /**
  * Created by ales on 13/07/16.
  */
-public class SendStates extends AsyncTask<Void, Void, Void> {
+public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
 
     String dstAddress;
     int dstPort;
@@ -21,7 +28,7 @@ public class SendStates extends AsyncTask<Void, Void, Void> {
     String response;
     TextView textResponse;
 
-    SendStates(TextView textResponse, String addr, int port, State state){
+    SendStatesButtonHandler(TextView textResponse, String addr, int port, State state){
         dstAddress = addr;
         dstPort = port;
         this.state = state;
@@ -39,11 +46,11 @@ public class SendStates extends AsyncTask<Void, Void, Void> {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             // Send possible states
-            String psm = state.getPossibleStatesMessage();
+            String psm = generatePossibleStatesMessage(this.state);
             out.println(psm);
 
             // Send selected state
-            String ssm = state.getSelectedStateMessage();
+            String ssm = generateSelectedStateMessage(this.state);
             out.println(ssm);
 
             response = "Sent";
@@ -73,4 +80,22 @@ public class SendStates extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(result);
     }
 
+
+    public String generatePossibleStatesMessage(State state) {
+
+        PossibleStatesMessage posStMsg = new PossibleStatesMessage(
+                state.getClientIP(), state.getServerIP(), state.getClientID(),
+                state.getServerID(), state.getPossibleStates(), state.getInitState());
+
+        return WriteJSON.serialize(posStMsg);
+    }
+
+    public String generateSelectedStateMessage(State state) {
+
+        SelectedStateMessage selStMsg = new SelectedStateMessage(
+                state.getClientIP(), state.getServerIP(), state.getClientID(),
+                state.getServerID(), state.getSelectedState());
+
+        return WriteJSON.serialize(selStMsg);
+    }
 }

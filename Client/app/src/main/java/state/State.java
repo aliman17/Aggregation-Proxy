@@ -1,15 +1,10 @@
 package state;
 
 import android.content.Context;
-
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import json.WriteJSON;
-import json.messages.PossibleStatesMessage;
-import json.messages.SelectedStateMessage;
 
 
 public class State {
@@ -17,13 +12,11 @@ public class State {
 	private String 	clientIP;
 	private String 	clientID;
 	private String 	serverIP;
-	private int 	serverPort;
 	private String 	serverID;
-
-	public 	ArrayList<Double> 	sensorValues;
-	private double[] 			possibleStates;
-	private double 				initState;
-	private double 				selectedState;
+	private int 	serverPort;
+	private double 	initState;
+	private double 	selectedState;
+	private double[] possibleStates;
 
 	public State(Context context) {
 		// TODO
@@ -36,40 +29,21 @@ public class State {
 		selectedState = 2;
 	}
 
-	public void setPossibleStates(double[] possibleStates) {
-		this.possibleStates = possibleStates;
-	}
+	// GETTER FUNCTIONS
+	public String getClientIP()		{ return this.clientIP;  }
+	public String getClientID()		{ return this.clientID;  }
+	public String getServerIP()		{ return this.serverIP;  }
+	public int    getServerPort()	{ return this.serverPort;}
+	public String getServerID()		{ return this.serverID;  }
+	public double getInitState()	{ return this.initState; }
+	public double   getSelectedState (){ return this.selectedState; }
+	public double[] getPossibleStates(){ return this.possibleStates;}
 
-	public void setSelectedStates(double selectedState) {
-		this.selectedState = selectedState;
-	}
+	// SETTER FUNCTIONS
+	public void setPossibleStates(double[] possibleStates) { this.possibleStates = possibleStates;}
+	public void setSelectedStates(double   selectedState ) { this.selectedState = selectedState;  }
 
-	public double[] getPossibleStates(){
-		return this.possibleStates;
-	}
-
-	public double getSelectedState(){
-		return this.selectedState;
-	}
-
-	public String getPossibleStatesMessage() {
-
-		PossibleStatesMessage posStMsg = new PossibleStatesMessage(
-				this.clientIP, this.serverIP, this.clientID,
-				this.serverID, this.possibleStates, this.initState);
-
-		return WriteJSON.serialize(posStMsg);
-	}
-
-	public String getSelectedStateMessage() {
-
-		SelectedStateMessage selStMsg = new SelectedStateMessage(
-				this.clientIP, this.serverIP, this.clientID,
-				this.serverID, this.selectedState);
-
-		return WriteJSON.serialize(selStMsg);
-	}
-
+	// HELPER FUNCTIONS
 	public static String getMyIp() {
 		boolean useIPv4 = true;
 		try {
@@ -97,6 +71,5 @@ public class State {
 		} catch (Exception ex) { } // for now eat exceptions
 		return "Can't get clientIP";
 	}
-
 
 }

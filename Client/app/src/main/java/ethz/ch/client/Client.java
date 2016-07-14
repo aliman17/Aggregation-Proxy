@@ -3,54 +3,27 @@ package ethz.ch.client;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.DeadObjectException;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
-
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.StaticLabelsFormatter;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.DataPointInterface;
-import com.jjoe64.graphview.series.OnDataPointTapListener;
-import com.jjoe64.graphview.series.PointsGraphSeries;
-import com.jjoe64.graphview.series.Series;
 
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
+import android.os.DeadObjectException;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import android.widget.Toast;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
 import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
-import clustering.Cluster;
-import clustering.Clustering;
-import clustering.KMeans_first_example;
-import clustering.Point;
-import database.DatabaseHandler;
 import nervousnet.Nervousnet;
 import state.State;
 
@@ -69,6 +42,8 @@ public class Client extends Activity {
     protected NervousnetRemote mService;
     private ServiceConnection mServiceConnection;
     private Boolean bindFlag;
+
+    private Nervousnet nervousnet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +66,7 @@ public class Client extends Activity {
         buttonNervousnet.setOnClickListener(buttonNervousnetOnClickListener);
 
         // Get sensors data
-        Nervousnet nervousnet = new Nervousnet(this);
+        nervousnet = new Nervousnet(this);
 
 
         // Initialize state of the client
@@ -159,7 +134,6 @@ public class Client extends Activity {
         //Log.d("PossibleStates", Arrays.toString(possibleStates));
 
 
-
     }
 
     protected void initButtonConnectOnClickListener(Context context) {
@@ -180,7 +154,7 @@ public class Client extends Activity {
         this.buttonConnectOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                SendStates myClientTask = new SendStates(
+                SendStatesButtonHandler myClientTask = new SendStatesButtonHandler(
                         textResponse,
                         bundle.getString(dstAddress),
                         bundle.getInt(dstPort),
@@ -196,7 +170,7 @@ public class Client extends Activity {
             @Override
             public void onClick(View arg0) {
                 NervousnetButtonHandler myClientTask = new NervousnetButtonHandler(
-                        textNervousnet, new Nervousnet(context));
+                        textNervousnet, nervousnet);
                 myClientTask.execute();
             }
         };
