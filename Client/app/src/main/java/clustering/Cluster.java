@@ -4,11 +4,10 @@ package clustering;
  * Created by ales on 27/06/16.
  */
 import java.util.ArrayList;
-import java.util.List;
 
 public class Cluster {
 
-    public List points;
+    public ArrayList points;
     public Point centroid;
     public int id;
 
@@ -19,7 +18,7 @@ public class Cluster {
         this.centroid = null;
     }
 
-    public List getPoints() {
+    public ArrayList getPoints() {
         return points;
     }
 
@@ -27,7 +26,7 @@ public class Cluster {
         points.add(point);
     }
 
-    public void setPoints(List points) {
+    public void setPoints(ArrayList points) {
         this.points = points;
     }
 

@@ -5,10 +5,10 @@ import json.messages.BaseMessage;
 
 public class WriteJSON {
 	
-	public static String serialize(BaseMessage bmsg){
+	public static String serialize(String name, Object msg){
 		// Include possibleStates is patch to include double array, otherwise
 		// the values are not presented in the array
-		String msg = new JSONSerializer().include("possibleStates").serialize(bmsg);
-		return msg;
+		String msgSer = new JSONSerializer().include(name).serialize(msg);
+		return msgSer;
 	}
 }

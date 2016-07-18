@@ -1,5 +1,7 @@
 package json.messages;
 
+import java.util.ArrayList;
+
 import json.enums.MessageTypes;
 
 /**
@@ -24,13 +26,14 @@ public class PossibleStatesMessage extends BaseMessage {
 	}
 	
 	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID,
-			double[] possibleStates, double initState) {
+								 double[] possibleStates, double initState) {
 		super(srcIP, dstIP, srcID, dstID);
 		this.type = MessageTypes.POSSIBLE_STATES_MSG;
 		this.possibleStates = possibleStates;
 		this.initState = initState;
 	}
 	
+	/*
 	public String toString() {
 		StringBuilder sb = new StringBuilder("[\n");
 		sb.append(super.toString());
@@ -48,5 +51,5 @@ public class PossibleStatesMessage extends BaseMessage {
 		sb.append("]");
 		return sb.toString();
 	}
-
+	*/
 }

@@ -16,10 +16,8 @@ import java.util.ArrayList;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
-import ch.ethz.coss.nervousnet.lib.LightReading;
 import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
 import ch.ethz.coss.nervousnet.lib.Utils;
-import ethz.ch.client.Client;
 
 /**
  * Created by ales on 28/06/16.
@@ -128,7 +126,7 @@ public class Nervousnet {
         return -1;
     }
 
-    public double[] getLightValues(int n){
+    public ArrayList<Double> getLightValues(int n){
 
         if (mServiceConnection == null) initConnection();
         if (mService == null) doBindService();
@@ -136,13 +134,13 @@ public class Nervousnet {
         // If binding is not ok, this function will handle it
         checkBinding();
 
-        double[] array = new double[n];
+        ArrayList<Double> array = new ArrayList<Double>();
 
         if (mService != null) {
             // Example
             for(int i = 0; i < 10; i++){
                 Float fl = new Float(getLightValue());
-                array[i] = fl.doubleValue();
+                array.add(fl.doubleValue());
             }
         } else {
             Toast.makeText(context.getApplicationContext(),
@@ -152,24 +150,33 @@ public class Nervousnet {
         return array;
     }
 
-    public double[] getLightValues(long startTimeEpoch, long endTimeEpoch){
+    public ArrayList<Double> getLightValues(long startTimeEpoch, long endTimeEpoch){
 
         checkBinding();
         ArrayList<Double> values = new ArrayList();
         try {
-            mService.getReadings(LibConstants.SENSOR_NOISE, startTimeEpoch, endTimeEpoch, values);
+            mService.getReadings(LibConstants.SENSOR_LIGHT, startTimeEpoch, endTimeEpoch, values);
         } catch (DeadObjectException doe) {
             doe.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+        return values;
+    }
 
-        // Convert to double[]
-        int nValues = values.size();
-        double[] dValues = new double[nValues];
-        for (int i = 0; i < nValues; i++)
-            dValues[i] = values.get(i);
-        return dValues;
+    public ArrayList getAccelerometerValues(long startTimeEpoch, long endTimeEpoch){
+
+        checkBinding();
+        ArrayList values = new ArrayList();
+        try {
+            mService.getReadings(LibConstants.SENSOR_ACCELEROMETER, startTimeEpoch, endTimeEpoch, values);
+        } catch (DeadObjectException doe) {
+            doe.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        //Log.d("ACC", values.get(0).toString());
+        return values;
     }
 
 

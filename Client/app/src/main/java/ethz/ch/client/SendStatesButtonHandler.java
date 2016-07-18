@@ -87,7 +87,7 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
                 state.getClientIP(), state.getServerIP(), state.getClientID(),
                 state.getServerID(), state.getPossibleStates(), state.getInitState());
 
-        return WriteJSON.serialize(posStMsg);
+        return WriteJSON.serialize("possibleStates", posStMsg);
     }
 
     public String generateSelectedStateMessage(State state) {
@@ -96,6 +96,6 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
                 state.getClientIP(), state.getServerIP(), state.getClientID(),
                 state.getServerID(), state.getSelectedState());
 
-        return WriteJSON.serialize(selStMsg);
+        return WriteJSON.serialize("selectedState", selStMsg);
     }
 }
