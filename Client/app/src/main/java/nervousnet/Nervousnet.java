@@ -8,15 +8,19 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.DeadObjectException;
 import android.os.IBinder;
+import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
+import ch.ethz.coss.nervousnet.lib.LightReading;
 import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
+import ch.ethz.coss.nervousnet.lib.SensorReading;
 import ch.ethz.coss.nervousnet.lib.Utils;
 
 /**
@@ -108,12 +112,12 @@ public class Nervousnet {
     }
 
     public float getLightValue(){
-        AccelerometerReading lReading = null;
+        LightReading lReading = null;
         try {
-            lReading = (AccelerometerReading) mService.getReading(LibConstants.SENSOR_ACCELEROMETER);
+            lReading = (LightReading) mService.getReading(LibConstants.SENSOR_LIGHT);
             if (lReading != null) {
-                Log.d("Nervousnet", "Light=" + lReading.getX());
-                return lReading.getX();
+                Log.d("Nervousnet", "Light=" + lReading.getLuxValue());
+                return lReading.getLuxValue();
             } else {
                 Log.d("Light object is null", "");
             }
@@ -138,9 +142,14 @@ public class Nervousnet {
 
         if (mService != null) {
             // Example
-            for(int i = 0; i < 10; i++){
+            for(int i = 0; i < n; i++){
                 Float fl = new Float(getLightValue());
                 array.add(fl.doubleValue());
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             Toast.makeText(context.getApplicationContext(),
@@ -150,34 +159,35 @@ public class Nervousnet {
         return array;
     }
 
-    public ArrayList<Double> getLightValues(long startTimeEpoch, long endTimeEpoch){
+    /*public ArrayList<Double> getLightValues(long startTimeEpoch, long endTimeEpoch){
 
         checkBinding();
         ArrayList<Double> values = new ArrayList();
+        RemoteCallbackList list = new RemoteCallbackList();
         try {
-            mService.getReadings(LibConstants.SENSOR_LIGHT, startTimeEpoch, endTimeEpoch, values);
+            mService.getReadings(LibConstants.SENSOR_LIGHT, startTimeEpoch, endTimeEpoch, list);
         } catch (DeadObjectException doe) {
             doe.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
         return values;
-    }
+    }*/
 
-    public ArrayList getAccelerometerValues(long startTimeEpoch, long endTimeEpoch){
+    /*public ArrayList getAccelerometerValues(long startTimeEpoch, long endTimeEpoch){
 
         checkBinding();
-        ArrayList values = new ArrayList();
+        ArrayList list = new ArrayList();
         try {
-            mService.getReadings(LibConstants.SENSOR_ACCELEROMETER, startTimeEpoch, endTimeEpoch, values);
+            mService.getReadings(LibConstants.SENSOR_ACCELEROMETER, System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), System.currentTimeMillis(), list);
         } catch (DeadObjectException doe) {
             doe.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
         //Log.d("ACC", values.get(0).toString());
-        return values;
-    }
+        return list;
+    }*/
 
 
 }

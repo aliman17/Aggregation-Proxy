@@ -7,15 +7,14 @@ import java.util.ArrayList;
 
 public class Cluster {
 
-    public ArrayList points;
-    public Point centroid;
-    public int id;
+    public int id;              // id of the cluster
+    public Point centroid;      // centroid of the cluster, based on the points
+    public ArrayList points;    // point of the cluster
 
-    //Creates a new Cluster
     public Cluster(int id) {
         this.id = id;
-        this.points = new ArrayList();
         this.centroid = null;
+        this.points = new ArrayList();
     }
 
     public ArrayList getPoints() {

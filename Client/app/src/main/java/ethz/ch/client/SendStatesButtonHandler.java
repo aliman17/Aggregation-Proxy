@@ -46,11 +46,17 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             // Send possible states
-            String psm = generatePossibleStatesMessage(this.state);
+            PossibleStatesMessage posStMsg = new PossibleStatesMessage(
+                    state.getClientIP(), state.getServerIP(), state.getClientID(),
+                    state.getServerID(), state.getPossibleStates(), state.getInitState());
+            String psm = WriteJSON.serialize("possibleStates", posStMsg);
             out.println(psm);
 
             // Send selected state
-            String ssm = generateSelectedStateMessage(this.state);
+            SelectedStateMessage selStMsg = new SelectedStateMessage(
+                    state.getClientIP(), state.getServerIP(), state.getClientID(),
+                    state.getServerID(), state.getSelectedState());
+            String ssm = WriteJSON.serialize("selectedState", selStMsg);
             out.println(ssm);
 
             response = "Sent";
@@ -78,24 +84,5 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void result) {
         textResponse.setText(response);
         super.onPostExecute(result);
-    }
-
-
-    public String generatePossibleStatesMessage(State state) {
-
-        PossibleStatesMessage posStMsg = new PossibleStatesMessage(
-                state.getClientIP(), state.getServerIP(), state.getClientID(),
-                state.getServerID(), state.getPossibleStates(), state.getInitState());
-
-        return WriteJSON.serialize("possibleStates", posStMsg);
-    }
-
-    public String generateSelectedStateMessage(State state) {
-
-        SelectedStateMessage selStMsg = new SelectedStateMessage(
-                state.getClientIP(), state.getServerIP(), state.getClientID(),
-                state.getServerID(), state.getSelectedState());
-
-        return WriteJSON.serialize("selectedState", selStMsg);
     }
 }

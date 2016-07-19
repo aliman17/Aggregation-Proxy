@@ -36,23 +36,8 @@ public class Point {
     }
 
     //Calculates the distance between two points.
-    protected static double distance(Point p, Point centroid) {
-        return Math.abs(p.getX() - centroid.getX());
-    }
-
-    //Creates random point
-    protected static Point createRandomPoint(int min, int max) {
-        Random r = new Random();
-        double x = min + (max - min) * r.nextDouble();
-        return new Point(x);
-    }
-
-    protected static List createRandomPoints(int min, int max, int number) {
-        List points = new ArrayList(number);
-        for(int i = 0; i < number; i++) {
-            points.add(createRandomPoint(min,max));
-        }
-        return points;
+    protected static double distance(Point p1, Point p2) {
+        return Math.abs(p1.getX() - p2.getX());
     }
 
     public String toString() {

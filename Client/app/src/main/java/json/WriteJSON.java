@@ -1,7 +1,6 @@
 package json;
 
 import flexjson.JSONSerializer;
-import json.messages.BaseMessage;
 
 public class WriteJSON {
 	

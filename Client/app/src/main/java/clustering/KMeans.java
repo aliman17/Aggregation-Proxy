@@ -8,14 +8,11 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KMeans_first_example implements Clustering{
+public class KMeans implements Clustering{
 
     private int NUM_CLUSTERS = 3;
 
-    private static final int MIN_COORDINATE = 0;
-    private static final int MAX_COORDINATE = 10;
-
-    public KMeans_first_example() {}
+    public KMeans() {}
 
     private void initClusters(ArrayList clusters, ArrayList<Point> points){
 
@@ -37,7 +34,7 @@ public class KMeans_first_example implements Clustering{
             Point centroid = new Point(minpoint.getX() + i*h + h/2);
             cluster.setCentroid(centroid);
             clusters.add(cluster);
-            Log.d("CLUSTER_INIT", centroid.getX()+"");
+            Log.d("KMEANS-controids", centroid.getX()+"");
         }
     }
 
