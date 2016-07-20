@@ -6,15 +6,13 @@ import android.widget.Toast;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.DataPointInterface;
-import com.jjoe64.graphview.series.OnDataPointTapListener;
+
 import com.jjoe64.graphview.series.PointsGraphSeries;
-import com.jjoe64.graphview.series.Series;
 
 import java.util.ArrayList;
 
-import clustering.Cluster;
-import clustering.Point;
+import clusteringByWindow.Cluster;
+import clusteringByWindow.Point;
 import ethz.ch.client.Client;
 
 /**
@@ -26,17 +24,14 @@ public class GraphPlot {
         // Convert data of Points into DataPoint
         DataPoint[] data = new DataPoint[pointsInit.size()];
         DataPoint[] clusters = new DataPoint[clustersInit.size()];
-        for(int i = 0; i < pointsInit.size(); i++)
-            data[i] = new DataPoint(pointsInit.get(i).getX(), i);
-        for(int i = 0; i < clustersInit.size(); i++)
-            clusters[i] = new DataPoint(clustersInit.get(i).getCentroid().getX(), -5);
-
-        // Plot clusters
-        PointsGraphSeries<DataPoint> point_series2 = new PointsGraphSeries<DataPoint>(clusters);
-        point_graph.addSeries(point_series2);
-        point_series2.setShape(PointsGraphSeries.Shape.POINT);
-        point_series2.setColor(Color.RED);
-        point_series2.setSize(10);
+        for(int i = 0; i < pointsInit.size(); i++) {
+            double[] coord = pointsInit.get(i).getCoordinates();
+            data[i] = new DataPoint(coord[0], coord[1]);
+        }
+        for(int i = 0; i < clustersInit.size(); i++) {
+            double[] coord = clustersInit.get(i).getCentroid().getCoordinates();
+            clusters[i] = new DataPoint(coord[0], coord[1]);
+        }
 
         // Plot Points
         PointsGraphSeries<DataPoint> point_series = new PointsGraphSeries<DataPoint>(data);
@@ -44,6 +39,13 @@ public class GraphPlot {
         point_series.setShape(PointsGraphSeries.Shape.POINT);
         point_series.setColor(Color.BLACK);
         point_series.setSize(5);
+
+        // Plot clusters
+        PointsGraphSeries<DataPoint> point_series2 = new PointsGraphSeries<DataPoint>(clusters);
+        point_graph.addSeries(point_series2);
+        point_series2.setShape(PointsGraphSeries.Shape.POINT);
+        point_series2.setColor(Color.RED);
+        point_series2.setSize(10);
 
         // Additional format
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(point_graph);

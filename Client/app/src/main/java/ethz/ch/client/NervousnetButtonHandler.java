@@ -8,10 +8,10 @@ import com.jjoe64.graphview.GraphView;
 
 import java.util.ArrayList;
 
-import clustering.Cluster;
-import clustering.Clustering;
-import clustering.KMeans;
-import clustering.Point;
+import clusteringByWindow.Cluster;
+import clusteringByWindow.Clustering;
+import clusteringByWindow.KMeans;
+import clusteringByWindow.Point;
 import json.WriteJSON;
 import nervousnet.Nervousnet;
 import plot.GraphPlot;
@@ -31,15 +31,17 @@ public class NervousnetButtonHandler extends AsyncTask<Void, Void, Void> {
     GraphView graph;
     ArrayList<Point> points;
     ArrayList<Cluster> clusters;
+    int dimensions;
 
     public NervousnetButtonHandler(Context context, TextView nervousnetText, Nervousnet nervousnet,
-                                   State state, TextView sendResponse, GraphView graph){
+                                   State state, TextView sendResponse, GraphView graph, int dimensions){
         this.context = context;
         this.nervousnetText = nervousnetText;
         this.nervousnet = nervousnet;
         this.state = state;
         this.sendResponse = sendResponse;
         this.graph = graph;
+        this.dimensions = dimensions;
     }
 
     @Override
@@ -50,19 +52,28 @@ public class NervousnetButtonHandler extends AsyncTask<Void, Void, Void> {
 
         // Convert into Points
         points = new ArrayList<>();
-        for (double d : data)
-                points.add(new Point(d));
+        for (double d : data){
+            double[] coord = {d, d};
+            points.add(new Point(coord));
+        }
 
         // Clustering
-        Clustering clustering = new KMeans();
+        Clustering clustering = new KMeans(this.dimensions);
         clusters = clustering.compute(points);
 
         // Store
-        int clSize = clusters.size();
-        double[] dClusters = new double[clSize];
-        for (int i = 0; i < clSize; i++)
-            dClusters[i] = clusters.get(i).getCentroid().getX();
+        // Set possible states
+        int n = clusters.size();
+        double[] dClusters = new double[n*dimensions];
+        double[] curCoord = null;
+        for (int i = 0; i < n; i++) {
+            curCoord = clusters.get(i).getCentroid().getCoordinates();
+            for (int dim = 0; dim < dimensions; dim++)
+                dClusters[i * dimensions + dim] = curCoord[dim];
+        }
+        // Initialize state of the client
         state.setPossibleStates(dClusters);
+
         return null;
     }
 

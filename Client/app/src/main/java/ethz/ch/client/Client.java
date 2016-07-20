@@ -11,9 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
 import java.util.ArrayList;
-import clustering.Cluster;
-import clustering.Clustering;
-import clustering.KMeans;
+import clusteringByWindow.Cluster;
+import clusteringByWindow.Clustering;
+import clusteringByWindow.KMeans;
 import json.WriteJSON;
 import nervousnet.Nervousnet;
 import plot.GraphPlot;
@@ -25,6 +25,7 @@ public class Client extends Activity {
     TextView textNervousnet;
     Button buttonConnect, buttonNervousnet;
     GraphView point_graph;
+    int dimensions = 2;
 
     OnClickListener buttonConnectOnClickListener;
     OnClickListener buttonNervousnetOnClickListener;
@@ -61,7 +62,7 @@ public class Client extends Activity {
         ArrayList points = Utils.randomPoints();
 
         // Clustering
-        Clustering clustering = new KMeans();
+        Clustering clustering = new KMeans(dimensions);
         ArrayList<Cluster> clusters = clustering.compute(points);
 
         // Plot
@@ -70,10 +71,13 @@ public class Client extends Activity {
 
         // Set possible states
         int n = clusters.size();
-        double[] dClusters = new double[n];
-        for (int i = 0; i < n; i++)
-            dClusters[i] = clusters.get(i).getCentroid().getX();
-
+        double[] dClusters = new double[n*dimensions];
+        double[] curCoord = null;
+        for (int i = 0; i < n; i++) {
+            curCoord = clusters.get(i).getCentroid().getCoordinates();
+            for (int dim = 0; dim < dimensions; dim++)
+                dClusters[i * dimensions + dim] = curCoord[dim];
+        }
         // Initialize state of the client
         state = new State(this);
         state.setPossibleStates(dClusters);
@@ -116,7 +120,7 @@ public class Client extends Activity {
             public void onClick(View arg0) {
                 sendResponse.setText("Collecting data ...");
                 NervousnetButtonHandler myClientTask = new NervousnetButtonHandler(context,
-                        textNervousnet, nervousnet, state, sendResponse, point_graph);
+                        textNervousnet, nervousnet, state, sendResponse, point_graph, dimensions);
                 myClientTask.execute();
             }
         };
