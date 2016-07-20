@@ -34,7 +34,7 @@ public class KMeans implements Clustering{
             Point centroid = new Point(minpoint.getX() + i*h + h/2);
             cluster.setCentroid(centroid);
             clusters.add(cluster);
-            Log.d("KMEANS-controids", centroid.getX()+"");
+            Log.d("KMEANS-init-controids", centroid.getX()+"");
         }
     }
 
@@ -42,7 +42,7 @@ public class KMeans implements Clustering{
     @Override
     public ArrayList<Cluster> compute(ArrayList<Point> points) {
 
-        ArrayList clusters = new ArrayList();
+        ArrayList<Cluster> clusters = new ArrayList();
         boolean finish = false;
 
         initClusters(clusters, points);
@@ -71,6 +71,9 @@ public class KMeans implements Clustering{
                 finish = true;
             }
         }
+
+        for(Cluster c : clusters)
+            Log.d("KMEANS-final-centroids", c.getCentroid().getX() + "");
         return clusters;
     }
 

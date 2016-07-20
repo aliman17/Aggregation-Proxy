@@ -1,9 +1,6 @@
 package ethz.ch.client;
 
-import android.graphics.Color;
 import android.os.Bundle;
-
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -12,23 +9,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.StaticLabelsFormatter;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.DataPointInterface;
-import com.jjoe64.graphview.series.OnDataPointTapListener;
-import com.jjoe64.graphview.series.PointsGraphSeries;
-import com.jjoe64.graphview.series.Series;
-
 import java.util.ArrayList;
-import java.util.Random;
-
 import clustering.Cluster;
 import clustering.Clustering;
 import clustering.KMeans;
-import clustering.Point;
 import json.WriteJSON;
 import nervousnet.Nervousnet;
 import plot.GraphPlot;
@@ -73,7 +58,7 @@ public class Client extends Activity {
         nervousnet.connect();
 
         // TODO: random points used
-        ArrayList points = randomPoints();
+        ArrayList points = Utils.randomPoints();
 
         // Clustering
         Clustering clustering = new KMeans();
@@ -135,26 +120,5 @@ public class Client extends Activity {
                 myClientTask.execute();
             }
         };
-    }
-
-
-    public static ArrayList<Point> randomPoints(){
-        // Test data
-        ArrayList<Point> points = new ArrayList<>();
-
-        // Create some random values
-        Random rand = new Random();
-        for (int i = 0; i < 10; i++){
-            points.add(new Point(rand.nextDouble()* 10));
-        }
-
-        for (int i = 0; i < 10; i++){
-            points.add(new Point(rand.nextDouble()* 10 + 15));
-        }
-
-        for (int i = 0; i < 10; i++){
-            points.add(new Point(rand.nextDouble()* 10 + 20));
-        }
-        return points;
     }
 }

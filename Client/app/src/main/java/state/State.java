@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 
 public class State {
@@ -25,7 +24,7 @@ public class State {
 		clientID = "ExampleClientID";
 		serverIP = "localhost";
 		serverID = "ExampleServerID";
-		serverPort = 8080;
+		serverPort = 8080;  // TODO: server IP and server port are specified in manifest, and that is used directly at the sending stage in Client
 		initState = 1;
 		selectedState = 2;
 	}
@@ -48,9 +47,9 @@ public class State {
 	public static String getMyIp() {
 		boolean useIPv4 = true;
 		try {
-			List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+			ArrayList<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
 			for (NetworkInterface intf : interfaces) {
-				List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+				ArrayList<InetAddress> addrs = Collections.list(intf.getInetAddresses());
 				for (InetAddress addr : addrs) {
 					if (!addr.isLoopbackAddress()) {
 						String sAddr = addr.getHostAddress();

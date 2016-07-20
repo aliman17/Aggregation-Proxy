@@ -44,7 +44,7 @@ public class Nervousnet {
         this.context = context;
     }
 
-    // RUN THIS
+    // Connect
     public void connect(){
         initConnection();
         doBindService();
