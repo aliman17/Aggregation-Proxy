@@ -7,4 +7,6 @@ import java.util.ArrayList;
  */
 public interface Clustering {
     public ArrayList<Cluster> compute(ArrayList<Point> points);
+    public int[] classify(ArrayList<Point> points);
+    public int classify(Point point);
 }

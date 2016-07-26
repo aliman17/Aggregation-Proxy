@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
 import java.util.ArrayList;
 import clusteringByWindow.Cluster;
-import clusteringByWindow.Clustering;
 import clusteringByWindow.KMeans;
+import clusteringByWindow.Clustering;
 import json.WriteJSON;
 import nervousnet.Nervousnet;
 import plot.GraphPlot;
@@ -21,18 +21,15 @@ import state.State;
 
 public class Client extends Activity {
 
-    TextView sendResponse;
-    TextView textNervousnet;
-    Button buttonConnect, buttonNervousnet;
+    State state;
+    Nervousnet nervousnet;
     GraphView point_graph;
-    int dimensions = 2;
-
+    int numOfClusters = 3;
+    int numOfDimensions = 2;
+    TextView sendResponse, textNervousnet;
+    Button buttonConnect, buttonNervousnet;
     OnClickListener buttonConnectOnClickListener;
     OnClickListener buttonNervousnetOnClickListener;
-
-    State state;
-
-    private Nervousnet nervousnet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +53,13 @@ public class Client extends Activity {
 
         // Get sensors data
         nervousnet = new Nervousnet(this);
-        nervousnet.connect();
+        //TODO nervousnet.connect();
 
         // TODO: random points used
         ArrayList points = Utils.randomPoints();
 
         // Clustering
-        Clustering clustering = new KMeans(dimensions);
+        Clustering clustering = new KMeans(numOfDimensions, numOfClusters);
         ArrayList<Cluster> clusters = clustering.compute(points);
 
         // Plot
@@ -71,12 +68,12 @@ public class Client extends Activity {
 
         // Set possible states
         int n = clusters.size();
-        double[] dClusters = new double[n*dimensions];
+        double[] dClusters = new double[n*numOfDimensions];
         double[] curCoord = null;
         for (int i = 0; i < n; i++) {
             curCoord = clusters.get(i).getCentroid().getCoordinates();
-            for (int dim = 0; dim < dimensions; dim++)
-                dClusters[i * dimensions + dim] = curCoord[dim];
+            for (int dim = 0; dim < numOfDimensions; dim++)
+                dClusters[i * numOfDimensions + dim] = curCoord[dim];
         }
         // Initialize state of the client
         state = new State(this);
@@ -120,7 +117,8 @@ public class Client extends Activity {
             public void onClick(View arg0) {
                 sendResponse.setText("Collecting data ...");
                 NervousnetButtonHandler myClientTask = new NervousnetButtonHandler(context,
-                        textNervousnet, nervousnet, state, sendResponse, point_graph, dimensions);
+                        textNervousnet, nervousnet, state, sendResponse, point_graph,
+                        numOfDimensions, numOfClusters, buttonNervousnet);
                 myClientTask.execute();
             }
         };

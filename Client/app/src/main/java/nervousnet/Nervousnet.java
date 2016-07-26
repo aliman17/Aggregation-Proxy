@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
@@ -111,7 +112,7 @@ public class Nervousnet {
         }
     }
 
-    public float getLightValue(){
+    public float getLatestLightValue(){
         LightReading lReading = null;
         try {
             lReading = (LightReading) mService.getReading(LibConstants.SENSOR_LIGHT);
@@ -143,7 +144,7 @@ public class Nervousnet {
         if (mService != null) {
             // Example
             for(int i = 0; i < n; i++){
-                Float fl = new Float(getLightValue());
+                Float fl = new Float(getLatestLightValue());
                 array.add(fl.doubleValue());
                 try {
                     Thread.sleep(200);
@@ -157,6 +158,11 @@ public class Nervousnet {
         }
 
         return array;
+    }
+
+    public float getSimulatedValue(){
+        Random rand = new Random();
+        return rand.nextFloat();
     }
 
     /*public ArrayList<Double> getLightValues(long startTimeEpoch, long endTimeEpoch){
