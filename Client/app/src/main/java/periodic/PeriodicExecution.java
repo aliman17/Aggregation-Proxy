@@ -16,7 +16,7 @@ public class PeriodicExecution extends Thread {
     ArrayList<Point> points;
     Clustering clustering;
     Nervousnet nervousnet;
-    private boolean isRunning;
+    public boolean isRunning = false;
 
     public static int id = 0;
 
@@ -31,6 +31,8 @@ public class PeriodicExecution extends Thread {
     public void run() {
 
         Log.d("PERIODICITY", "Start periodic execution ...");
+        this.isRunning = true;
+
         id ++;
         int initRecomputeIterations = 10;
         int recomputeIterations = initRecomputeIterations;

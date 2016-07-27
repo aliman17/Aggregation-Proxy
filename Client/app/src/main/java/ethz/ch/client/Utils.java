@@ -1,9 +1,19 @@
 package ethz.ch.client;
 
+import android.util.Log;
+
+import com.jjoe64.graphview.GraphView;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
+import clusteringByWindow.Cluster;
+import clusteringByWindow.Clustering;
+import clusteringByWindow.KMeans;
 import clusteringByWindow.Point;
+import json.WriteJSON;
+import plot.GraphPlot;
 
 /**
  * Created by ales on 20/07/16.
@@ -32,4 +42,43 @@ public class Utils {
         }
         return points;
     }
+
+    public static ArrayList<Point> initPoints(){
+        Log.d("BUTTON", "Initialize points ...");
+        ArrayList<Point> points = new ArrayList<>();
+        //for(Double d : data){
+        //double[] coordinates = {d.doubleValue(), 1};
+        for(int i = 0; i < 30; i++)   { ;
+            Random rand = new Random();
+            double[] coordinates = {rand.nextDouble(), i+1};
+
+            points.add(new Point(coordinates));
+        }
+        return points;
+    }
+
+    public static Clustering computeClusters(ArrayList<Point> points){
+        Log.d("BUTTON", "Compute clusters ...");
+        // Cluster initially
+        int dim = 2;
+        int nOfClusters = 5;
+        Clustering clustering = new KMeans(dim, nOfClusters);
+        clustering.compute(points);
+        return clustering;
+    }
+
+    protected void plot(GraphPlot graph, ArrayList<Point> points, ArrayList<Cluster> clusters) {
+        Log.d("PLOTTING", "Start plotting ...");
+        try {
+            graph.plot(points, clusters);
+        } catch (Exception e) {
+
+        }
+        Log.d("PLOTTING", "Plotting completed!");
+
+        //this.nervousnetText.setText(WriteJSON.serialize("possibleStates", clusters));
+        //this.sendResponse.setText("Click 'SEND' to update sever ...");
+
+    }
+
 }

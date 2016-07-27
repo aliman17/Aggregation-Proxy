@@ -17,6 +17,7 @@ import clusteringByWindow.KMeans;
 import clusteringByWindow.Clustering;
 import json.WriteJSON;
 import nervousnet.Nervousnet;
+import periodic.PeriodicExecutionHandler;
 import plot.GraphPlot;
 import state.State;
 
@@ -24,13 +25,15 @@ public class Client extends Activity {
 
     State state;
     Nervousnet nervousnet;
-    GraphView point_graph;
+    GraphPlot graph;
     int numOfClusters = 3;
     int numOfDimensions = 2;
     TextView sendResponse, textNervousnet;
     Button buttonConnect, buttonNervousnet;
     OnClickListener buttonConnectOnClickListener;
     OnClickListener buttonNervousnetOnClickListener;
+
+    boolean isRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +67,9 @@ public class Client extends Activity {
         ArrayList<Cluster> clusters = clustering.compute(points);
 
         // Plot
-        point_graph = (GraphView) findViewById(R.id.graph);
-        GraphPlot.plot(points, clusters, point_graph);
+        GraphView graph_view = (GraphView) findViewById(R.id.graph);
+        graph = new GraphPlot(graph_view);
+        graph.plot(points, clusters);
 
         // Set possible states
         int n = clusters.size();
@@ -117,12 +121,18 @@ public class Client extends Activity {
         this.buttonNervousnetOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                sendResponse.setText("Collecting data ...");
-                NervousnetButtonHandler myClientTask = new NervousnetButtonHandler(context,
-                        textNervousnet, nervousnet, state, sendResponse, point_graph,
-                        numOfDimensions, numOfClusters, buttonNervousnet);
-                myClientTask.execute();
-                Log.d("ACTIVITY-BUTTON", "Nervousnet button successfully completed!");
+                if (isRunning == false) {
+                    isRunning = true;
+                    buttonNervousnet.setText("Stop executing ...");
+                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler(nervousnet);
+                    perHandler.start();
+                }
+                else{
+                    isRunning = false;
+                    buttonNervousnet.setText("Get nervousnet data");
+                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler();
+                    perHandler.stop();
+                }
             }
         };
     }
