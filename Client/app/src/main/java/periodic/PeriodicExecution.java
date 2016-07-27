@@ -29,11 +29,17 @@ public class PeriodicExecution extends Thread {
 
     @Override
     public void run() {
+
+        Log.d("PERIODICITY", "Start periodic execution ...");
         id ++;
+        int initRecomputeIterations = 10;
+        int recomputeIterations = initRecomputeIterations;
+        ArrayList<Point> newPoints = new ArrayList<>();
+
         while (this.isRunning) {
             // pause
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -42,18 +48,30 @@ public class PeriodicExecution extends Thread {
             double latestValue = (double) nervousnet.getSimulatedValue();
 
             // classify
-            double[] coordinates = {latestValue, 1}; // we add 1 just for the y dimension
+            double[] coordinates = {latestValue, 1}; //TODO: get real data
             Point newPoint = new Point(coordinates);
-            //points.add(newPoint);
+            newPoints.add(newPoint);
             int clusterNum = clustering.classify(newPoint);
             Log.d("NEW_THREAD", "Goes to cluster " + clusterNum + " running:"+isRunning);
 
             // check if window has to be moved
+            recomputeIterations --;
+            if (recomputeIterations <= 0) {
+                recomputeIterations = initRecomputeIterations; // reset back to init
+                // update point list
+                points.addAll(newPoints);   // add new points to the original list
+                newPoints.clear();          // reset temporary storage for new ones
+                // delete old points
+                for (int i = 0; i < initRecomputeIterations; i++) points.remove(0);
+                // recompute clusters
+                clustering.compute(points);
+            }
         }
-        Log.d("NEW_THREAD", "FINISHED");
+        Log.d("PERIODICITY", "Finished periodic execution!");
     }
 
     public void stopExecution(){
+        Log.d("PERIODICITY", "Accepted stop instruction ...");
         this.isRunning = false;
     }
 }

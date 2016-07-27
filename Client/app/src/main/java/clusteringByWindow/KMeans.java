@@ -25,6 +25,8 @@ public class KMeans implements Clustering {
     @Override
     public ArrayList<Cluster> compute(ArrayList<Point> points) {
 
+        Log.d("KMEANS", "Start computing clusters ...");
+
         boolean finish = false;
 
         initClusters(points);
@@ -63,21 +65,24 @@ public class KMeans implements Clustering {
         for(Cluster c : clusters)
             Log.d("KMEANS-final-centroids", Arrays.toString(c.getCentroid().getCoordinates()) + "");
 
+        Log.d("KMEANS", "Computing clusters finished!");
         return clusters;
     }
 
     @Override
     public int[] classify(ArrayList<Point> points) {
+
         int[] classes = new int[points.size()];
         int i = 0;
         if (this.clusters != null){
             for(Point point : points) {
                 int cluster = classify(point);
-                //point.setCluster(cluster);
+                point.setCluster(cluster);
                 classes[i] = cluster;
                 i++;
             }
         }
+        Log.d("KMEANS", "New point classified!");
         return classes;
     }
 
@@ -106,7 +111,15 @@ public class KMeans implements Clustering {
 
         // Choose random centroids
         for (int i = 0; i < this.numOfClusters; i++){
-            Point centroid = points.get(rand.nextInt(sizeOfPoints));
+            // Get one of the points as an initial cluster
+            Integer newRandomInt = rand.nextInt(sizeOfPoints);
+            Point point = points.get(newRandomInt);
+            double[] coordinates = point.getCoordinates();
+            // Just add a little bit of disturbation into the first coordinate
+            // so that clusters don't overlap in case of selecting the same point
+            // several times
+            coordinates[0] += coordinates[0] * rand.nextDouble();
+            Point centroid = new Point(coordinates);
             Cluster c = new Cluster(i, centroid);
             clusters.add(c);
             Log.d("KMEANS-init-centroids", Arrays.toString(c.getCentroid().getCoordinates()) + "");

@@ -30,7 +30,7 @@ public class NervousnetButtonHandler {
     Context context;
     TextView nervousnetText;
     Nervousnet nervousnet;
-    ArrayList<Double> data;
+    //ArrayList<Double> data;
     State state;
     TextView sendResponse;
     GraphView graph;
@@ -59,6 +59,7 @@ public class NervousnetButtonHandler {
     }
 
     private void initPoints(){
+        Log.d("BUTTON", "Initialize points ...");
         points = new ArrayList<>();
         //for(Double d : data){
         //double[] coordinates = {d.doubleValue(), 1};
@@ -71,6 +72,7 @@ public class NervousnetButtonHandler {
     }
 
     private void computeClusters(){
+        Log.d("BUTTON", "Compute clusters ...");
         // Cluster initially
         int dim = 2;
         int nOfClusters = 5;
@@ -81,6 +83,7 @@ public class NervousnetButtonHandler {
 
 
     protected void execute() {
+        Log.d("BUTTON", "Nervousnet button pressed and is under execution ...");
         if (!isRunning) {
             initPoints();
             computeClusters();
@@ -92,6 +95,7 @@ public class NervousnetButtonHandler {
         }
         else {
             isRunning = false;
+            buttonNervousnet.setText("Stopping ...");
             if (thread != null) {
                 thread.stopExecution();
                 try {
@@ -103,18 +107,23 @@ public class NervousnetButtonHandler {
             buttonNervousnet.setText("Get nervousnet data");
         }
 
-
     }
 
     protected void finish() {
+        Log.d("PLOTTING", "Start plotting ...");
         graph.removeAllSeries();
-        GraphPlot.plot(points, clusters, graph);
-        this.nervousnetText.setText(WriteJSON.serialize("possibleStates", data));
+        try {
+            GraphPlot.plot(points, clusters, graph);
+        } catch (Exception e) {
+
+        }
+        this.nervousnetText.setText(WriteJSON.serialize("possibleStates", clusters));
         this.sendResponse.setText("Click 'SEND' to update sever ...");
+        Log.d("PLOTTING", "Plotting completed!");
     }
 
 
-    private void run(){
+    /*private void run(){
         // Nervousnet
         // data = nervousnet.getAccelerometerValues(1368830762000L, 1468830782000L);
 
@@ -142,4 +151,5 @@ public class NervousnetButtonHandler {
         // Initialize state of the client
         state.setPossibleStates(dClusters);
     }
+    */
 }

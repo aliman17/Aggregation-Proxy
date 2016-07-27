@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -106,6 +107,7 @@ public class Client extends Activity {
                         bundle.getInt(dstPort),
                         state);
                 myClientTask.execute();
+                Log.d("ACTIVITY-BUTTON", "Connect button successfully completed!");
             }
         };
     }
@@ -120,6 +122,7 @@ public class Client extends Activity {
                         textNervousnet, nervousnet, state, sendResponse, point_graph,
                         numOfDimensions, numOfClusters, buttonNervousnet);
                 myClientTask.execute();
+                Log.d("ACTIVITY-BUTTON", "Nervousnet button successfully completed!");
             }
         };
     }

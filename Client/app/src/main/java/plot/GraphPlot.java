@@ -1,6 +1,7 @@
 package plot;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
@@ -19,6 +20,14 @@ import ethz.ch.client.Client;
  * Created by ales on 19/07/16.
  */
 public class GraphPlot {
+    /**
+     * The function takes points and clusters and plots them. It considers only first two coordinates
+     * which means only 2 dimensions as we can easily plot in 2D plane. If the dimension is 1, then
+     * the function automatically sets the second coordinate to a constant value 1 and plots it.
+     * @param pointsInit    points
+     * @param clustersInit  clusters
+     * @param point_graph   graph object for plotting
+     */
     public static void plot(ArrayList<Point> pointsInit, ArrayList<Cluster> clustersInit, GraphView point_graph) {
 
         // Convert data of Points into DataPoint
@@ -26,11 +35,25 @@ public class GraphPlot {
         DataPoint[] clusters = new DataPoint[clustersInit.size()];
         for(int i = 0; i < pointsInit.size(); i++) {
             double[] coord = pointsInit.get(i).getCoordinates();
-            data[i] = new DataPoint(coord[0], coord[1]);
+            if (coord.length >= 2)
+                data[i] = new DataPoint(coord[0], coord[1]);
+            else if (coord.length == 1)
+                data[i] = new DataPoint(coord[0], 1);
+            else {
+                // ignore this point as it has wrong number of coordinates
+                Log.d("GraphPlot", "Wrong coordinate type, so the point hasn't been plotted");
+            }
         }
         for(int i = 0; i < clustersInit.size(); i++) {
             double[] coord = clustersInit.get(i).getCentroid().getCoordinates();
-            clusters[i] = new DataPoint(coord[0], coord[1]);
+            if (coord.length >= 2)
+                clusters[i] = new DataPoint(coord[0], coord[1]);
+            else if (coord.length == 1)
+                clusters[i] = new DataPoint(coord[0], 1);
+            else {
+                // ignore this cluster as it has wrong number of coordinates
+                Log.d("GraphPlot", "Wrong coordinate type, so the cluster hasn't been plotted");
+            }
         }
 
         // Plot Points
