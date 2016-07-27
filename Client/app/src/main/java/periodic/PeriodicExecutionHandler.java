@@ -2,6 +2,7 @@ package periodic;
 
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import clusteringByWindow.Cluster;
@@ -15,16 +16,22 @@ import nervousnet.Nervousnet;
  */
 public class PeriodicExecutionHandler {
 
-    static PeriodicExecution periodicExecution;
-    ArrayList<Point> points;
-    Clustering clustering;
+    public static PeriodicExecution periodicExecution;
+    public static ArrayList<Point> points;
+    public static Clustering clustering;
     Nervousnet nervousnet;
 
     public PeriodicExecutionHandler() {}
 
     public PeriodicExecutionHandler(Nervousnet nervousnet){
-        /*this.points = points;
-        this.clustering = clustering;*/
+        this.points = new ArrayList<>();
+        //this.clustering = clustering;
+        this.nervousnet = nervousnet;
+    }
+
+    public PeriodicExecutionHandler(ArrayList<Point> points, Nervousnet nervousnet){
+        this.points = points;
+        //this.clustering = clustering;
         this.nervousnet = nervousnet;
     }
 
@@ -32,7 +39,12 @@ public class PeriodicExecutionHandler {
 
         if (periodicExecution == null){
             Log.d("BUTTON", "Nervousnet button pressed and is under execution ...");
-            points = Utils.initPoints();
+            // TODO: get data from nervousnet. Real data, not simulated one.
+            points.clear();
+            points.addAll( Utils.initPoints() ); // We don't want to lose reference
+                                                // we want changes to be visible outside
+                                                // of the this class too,
+                                                // for instance for plotting
             clustering = Utils.computeClusters(points);
             periodicExecution = new PeriodicExecution(points, clustering, nervousnet);
             periodicExecution.start();

@@ -26,5 +26,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile files('libs/flexjson-2.1.jar')
     compile files('libs/android-support-v4.jar')
-    compile 'ch.ethz.coss.nervousnet:nervousnetLIB:0.7.9'
+    compile 'ch.ethz.coss.nervousnet:nervousnetLIB:0.7.23'
 }

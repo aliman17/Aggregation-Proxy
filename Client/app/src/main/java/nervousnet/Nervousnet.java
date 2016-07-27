@@ -59,6 +59,7 @@ public class Nervousnet {
                 mService = NervousnetRemote.Stub.asInterface(service);
                 Toast.makeText(context.getApplicationContext(),
                         "NervousnetRemote Service connected", Toast.LENGTH_SHORT).show();
+                Log.d("MSERVICE_1", mService+"");
             }
 
             @Override
@@ -114,8 +115,9 @@ public class Nervousnet {
 
     public float getLatestLightValue(){
         LightReading lReading = null;
+        Log.d("MSERVICE_2", mService+"");
         try {
-            lReading = (LightReading) mService.getReading(LibConstants.SENSOR_LIGHT);
+            lReading = (LightReading) mService.getLatestReading(LibConstants.SENSOR_LIGHT);
             if (lReading != null) {
                 Log.d("Nervousnet", "Light=" + lReading.getLuxValue());
                 return lReading.getLuxValue();
@@ -126,6 +128,32 @@ public class Nervousnet {
             // TODO Auto-generated catch block
             doe.printStackTrace();
         } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public float getLatestAccValue(){
+        // TODO: throws error, that it can't be casted ot AccelometerReading
+
+        AccelerometerReading lReading = null;
+        Log.d("MSERVICE_2", mService+"");
+        try {
+            lReading = (AccelerometerReading) mService.getLatestReading(LibConstants.SENSOR_ACCELEROMETER);
+            if (lReading != null) {
+                Log.d("Nervousnet", "Light=" + lReading.getX());
+                return lReading.getX();
+            } else {
+                Log.d("Light object is null", "");
+            }
+        } catch (DeadObjectException doe) {
+            // TODO Auto-generated catch block
+            doe.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
             e.printStackTrace();
         }
         return -1;

@@ -102,6 +102,11 @@ public class KMeans implements Clustering {
         return cluster;
     }
 
+    @Override
+    public ArrayList<Cluster> getClusters() {
+        return this.clusters;
+    }
+
 
     private void initClusters(ArrayList<Point> points){
 

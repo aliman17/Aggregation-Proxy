@@ -11,10 +11,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import clusteringByWindow.Cluster;
 import clusteringByWindow.KMeans;
 import clusteringByWindow.Clustering;
+import clusteringByWindow.Point;
 import json.WriteJSON;
 import nervousnet.Nervousnet;
 import periodic.PeriodicExecutionHandler;
@@ -57,7 +60,7 @@ public class Client extends Activity {
 
         // Get sensors data
         nervousnet = new Nervousnet(this);
-        //TODO nervousnet.connect();
+        nervousnet.connect();
 
         // TODO: random points used
         ArrayList points = Utils.randomPoints();
@@ -132,6 +135,7 @@ public class Client extends Activity {
                     buttonNervousnet.setText("Get nervousnet data");
                     PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler();
                     perHandler.stop();
+                    graph.plot(PeriodicExecutionHandler.points, PeriodicExecutionHandler.clustering.getClusters());
                 }
             }
         };

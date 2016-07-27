@@ -47,7 +47,8 @@ public class PeriodicExecution extends Thread {
             }
 
             // get latest data
-            double latestValue = (double) nervousnet.getSimulatedValue();
+            //double latestValue = (double) nervousnet.getSimulatedValue();
+            double latestValue = (double) nervousnet.getLatestLightValue();
 
             // classify
             double[] coordinates = {latestValue, 1}; //TODO: get real data
