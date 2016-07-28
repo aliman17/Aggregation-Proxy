@@ -52,7 +52,7 @@ public class KMeans implements Clustering {
             //Calculates total distance between new and old Centroids
             double distance = 0;
             for(int i = 0; i < lastCentroids.size(); i++)
-                distance += Point.distance(lastCentroids.get(i), currentCentroids.get(i));
+                distance += Point.distance(this.numOfDimensions, lastCentroids.get(i), currentCentroids.get(i));
 
             if(distance == 0) {
                 finish = true;
@@ -93,7 +93,7 @@ public class KMeans implements Clustering {
 
         for(int i = 0; i < this.numOfClusters; i++) {
             Cluster c = clusters.get(i);
-            double distance = Point.distance(point, c.getCentroid());
+            double distance = Point.distance(this.numOfDimensions, point, c.getCentroid());
             if(distance < min){
                 min = distance;
                 cluster = i;
@@ -159,8 +159,9 @@ public class KMeans implements Clustering {
             double[] sum = new double[this.numOfDimensions];  // initialized to 0;
 
             for(Point point : points) {
+                double[] coordinates = point.getCoordinates();
                 for (int dim = 0; dim < this.numOfDimensions; dim++){
-                    sum[dim] += point.getCoordinates()[dim];
+                    sum[dim] += coordinates[dim];
                 }
             }
 

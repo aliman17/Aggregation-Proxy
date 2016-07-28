@@ -28,6 +28,7 @@ public class Client extends Activity {
 
     State state;
     Nervousnet nervousnet;
+    Clustering clustering;
     GraphPlot graph;
     int numOfClusters = 3;
     int numOfDimensions = 2;
@@ -62,32 +63,15 @@ public class Client extends Activity {
         nervousnet = new Nervousnet(this);
         nervousnet.connect();
 
-        // TODO: random points used
-        ArrayList points = Utils.randomPoints();
-
         // Clustering
-        Clustering clustering = new KMeans(numOfDimensions, numOfClusters);
-        ArrayList<Cluster> clusters = clustering.compute(points);
+        clustering = new KMeans(1, 3);
+
+        // Initialize state of the client
+        state = new State(this);
 
         // Plot
         GraphView graph_view = (GraphView) findViewById(R.id.graph);
         graph = new GraphPlot(graph_view);
-        graph.plot(points, clusters);
-
-        // Set possible states
-        int n = clusters.size();
-        double[] dClusters = new double[n*numOfDimensions];
-        double[] curCoord = null;
-        for (int i = 0; i < n; i++) {
-            curCoord = clusters.get(i).getCentroid().getCoordinates();
-            for (int dim = 0; dim < numOfDimensions; dim++)
-                dClusters[i * numOfDimensions + dim] = curCoord[dim];
-        }
-        // Initialize state of the client
-        state = new State(this);
-        state.setPossibleStates(dClusters);
-
-        textNervousnet.setText(WriteJSON.serialize("possibleStates", state.getPossibleStates()));
     }
 
     protected void initButtonConnectOnClickListener(Context context) {
@@ -127,7 +111,7 @@ public class Client extends Activity {
                 if (isRunning == false) {
                     isRunning = true;
                     buttonNervousnet.setText("Stop executing ...");
-                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler(nervousnet);
+                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler(state, clustering, nervousnet);
                     perHandler.start();
                 }
                 else{
@@ -139,5 +123,31 @@ public class Client extends Activity {
                 }
             }
         };
+    }
+
+    public void testData(){
+        // TODO: random points used
+        ArrayList points = Utils.randomPoints();
+
+        // Clustering
+        Clustering clustering = new KMeans(numOfDimensions, numOfClusters);
+        ArrayList<Cluster> clusters = clustering.compute(points);
+
+        // Plot
+        graph.plot(points, clusters);
+
+        // Set possible states
+        int n = clusters.size();
+        double[] dClusters = new double[n*numOfDimensions];
+        double[] curCoord = null;
+        for (int i = 0; i < n; i++) {
+            curCoord = clusters.get(i).getCentroid().getCoordinates();
+            for (int dim = 0; dim < numOfDimensions; dim++)
+                dClusters[i * numOfDimensions + dim] = curCoord[dim];
+        }
+
+        //TODO: state.setPossibleStates(dClusters);
+
+        textNervousnet.setText(WriteJSON.serialize("possibleStates", state.getPossibleStates()));
     }
 }

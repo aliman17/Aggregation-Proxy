@@ -46,7 +46,10 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             // Send possible states
-            PossibleStatesMessage posStMsg = new PossibleStatesMessage(
+
+            // TODO
+
+            /*PossibleStatesMessage posStMsg = new PossibleStatesMessage(
                     state.getClientIP(), state.getServerIP(), state.getClientID(),
                     state.getServerID(), state.getPossibleStates(), state.getInitState());
             String psm = WriteJSON.serialize("possibleStates", posStMsg);
@@ -57,7 +60,7 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
                     state.getClientIP(), state.getServerIP(), state.getClientID(),
                     state.getServerID(), state.getSelectedState());
             String ssm = WriteJSON.serialize("selectedState", selStMsg);
-            out.println(ssm);
+            out.println(ssm);*/
 
             response = "Sent";
         } catch (UnknownHostException e) {

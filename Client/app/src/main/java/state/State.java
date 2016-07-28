@@ -15,8 +15,8 @@ public class State {
 	private String 	serverID;
 	private int 	serverPort;
 	private double 	initState;
-	private double 	selectedState;
-	private double[] possibleStates;
+	private PossibleStatePoint selectedState;
+	private ArrayList<PossibleStatePoint> possibleStates;
 
 	public State(Context context) {
 		// TODO
@@ -26,7 +26,8 @@ public class State {
 		serverID = "ExampleServerID";
 		serverPort = 8080;  // TODO: server IP and server port are specified in manifest, and that is used directly at the sending stage in Client
 		initState = 1;
-		selectedState = 2;
+		//selectedState = 2;
+		possibleStates = new ArrayList<>();
 	}
 
 	// GETTER FUNCTIONS
@@ -36,12 +37,14 @@ public class State {
 	public int    getServerPort()	{ return this.serverPort;}
 	public String getServerID()		{ return this.serverID;  }
 	public double getInitState()	{ return this.initState; }
-	public double   getSelectedState (){ return this.selectedState; }
-	public double[] getPossibleStates(){ return this.possibleStates;}
+	public PossibleStatePoint getSelectedState (){ return this.selectedState; }
+	public ArrayList<PossibleStatePoint> getPossibleStates(){ return this.possibleStates;}
 
 	// SETTER FUNCTIONS
-	public void setPossibleStates(double[] possibleStates) { this.possibleStates = possibleStates;}
-	public void setSelectedStates(double   selectedState ) { this.selectedState = selectedState;  }
+	public void setPossibleStates(ArrayList<PossibleStatePoint> possibleStates) { this.possibleStates = possibleStates;}
+	public void addPossibleState(PossibleStatePoint point) { this.possibleStates.add(point); }
+	public void clearPossibleStates() { this.possibleStates.clear(); }
+	public void setSelectedStates(PossibleStatePoint selectedState ) { this.selectedState = selectedState;  }
 
 	// HELPER FUNCTIONS
 	public static String getMyIp() {

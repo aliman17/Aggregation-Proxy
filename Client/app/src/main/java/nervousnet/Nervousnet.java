@@ -113,17 +113,17 @@ public class Nervousnet {
         }
     }
 
-    public float getLatestLightValue(){
+
+
+    public NervousnetSensorPoint getLatestLightValue(){
         LightReading lReading = null;
-        Log.d("MSERVICE_2", mService+"");
+        Log.d("NERVOUSNET", "Getting light value ...");
         try {
             lReading = (LightReading) mService.getLatestReading(LibConstants.SENSOR_LIGHT);
-            if (lReading != null) {
-                Log.d("Nervousnet", "Light=" + lReading.getLuxValue());
-                return lReading.getLuxValue();
-            } else {
-                Log.d("Light object is null", "");
-            }
+            long timestamp = lReading.timestamp;
+            double[] values = {lReading.getLuxValue()};
+            int type = lReading.type;
+            return new NervousnetSensorPoint(type, timestamp, values);
         } catch (DeadObjectException doe) {
             // TODO Auto-generated catch block
             doe.printStackTrace();
@@ -132,10 +132,11 @@ public class Nervousnet {
         } catch (NullPointerException e){
             e.printStackTrace();
         }
-        return -1;
+        return null;
     }
 
-    public float getLatestAccValue(){
+
+   /* public float getLatestAccValue(){
         // TODO: throws error, that it can't be casted ot AccelometerReading
 
         AccelerometerReading lReading = null;
@@ -157,9 +158,9 @@ public class Nervousnet {
             e.printStackTrace();
         }
         return -1;
-    }
+    }*/
 
-    public ArrayList<Double> getLightValues(int n){
+    /*public ArrayList<Double> getLightValues(int n){
 
         if (mServiceConnection == null) initConnection();
         if (mService == null) doBindService();
@@ -192,7 +193,7 @@ public class Nervousnet {
         Random rand = new Random();
         return rand.nextFloat();
     }
-
+*/
     /*public ArrayList<Double> getLightValues(long startTimeEpoch, long endTimeEpoch){
 
         checkBinding();
@@ -223,5 +224,28 @@ public class Nervousnet {
         return list;
     }*/
 
+
+    /*public float getLatestLightValue(){
+        LightReading lReading = null;
+        Log.d("MSERVICE_2", mService+"");
+        try {
+            lReading = (LightReading) mService.getLatestReading(LibConstants.SENSOR_LIGHT);
+            long a = lReading.timestamp;
+            if (lReading != null) {
+                Log.d("Nervousnet", "Light=" + lReading.getLuxValue());
+                return lReading.getLuxValue();
+            } else {
+                Log.d("Light object is null", "");
+            }
+        } catch (DeadObjectException doe) {
+            // TODO Auto-generated catch block
+            doe.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return -1;
+    }*/
 
 }

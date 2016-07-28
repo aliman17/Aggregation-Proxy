@@ -13,6 +13,7 @@ import clusteringByWindow.Clustering;
 import clusteringByWindow.KMeans;
 import clusteringByWindow.Point;
 import json.WriteJSON;
+import nervousnet.NervousnetSensorPoint;
 import plot.GraphPlot;
 
 /**
@@ -79,6 +80,19 @@ public class Utils {
         //this.nervousnetText.setText(WriteJSON.serialize("possibleStates", clusters));
         //this.sendResponse.setText("Click 'SEND' to update sever ...");
 
+    }
+
+    public static ArrayList<Point> initialClusteringPoints(){
+        ArrayList<Point> points = new ArrayList<>();
+        //for(Double d : data){
+        //double[] coordinates = {d.doubleValue(), 1};
+        for(int i = 0; i < 10; i++)   { ;
+            Random rand = new Random();
+            double[] coordinates = {rand.nextDouble() * 600, 1};
+            NervousnetSensorPoint nsp = new NervousnetSensorPoint(0, System.currentTimeMillis(), coordinates);
+            points.add(new Point(coordinates, nsp));
+        }
+        return points;
     }
 
 }
