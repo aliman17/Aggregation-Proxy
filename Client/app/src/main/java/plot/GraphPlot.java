@@ -21,9 +21,29 @@ import ethz.ch.client.Client;
  */
 public class GraphPlot {
     public GraphView graph;
+    private ArrayList<Point> points;
+    private ArrayList<Cluster> clusters;
 
     public GraphPlot(GraphView graph){
         this.graph = graph;
+    }
+
+    public GraphPlot(GraphView graph, ArrayList<Point> points, ArrayList<Cluster> clusters){
+        this.graph = graph;
+        this.points = points;
+        this.clusters = clusters;
+    }
+
+    public void setPoint(ArrayList<Point> points){
+        this.points = points;
+    }
+
+    public void setClusters(ArrayList<Cluster> clusters){
+        this.clusters = clusters;
+    }
+
+    public void plot(){
+        plot(points, clusters);
     }
 
     /**

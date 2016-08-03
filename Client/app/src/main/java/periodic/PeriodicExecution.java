@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import clusteringByWindow.Cluster;
 import clusteringByWindow.Clustering;
 import clusteringByWindow.Point;
-import nervousnet.Nervousnet;
-import nervousnet.NervousnetSensorPoint;
+import sensor.SensorPoint;
+import sensor.iSensorSource;
 import state.PossibleStatePoint;
 
 /**
@@ -18,18 +18,23 @@ public class PeriodicExecution extends Thread {
 
     ArrayList<Point> points;
     Clustering clustering;
-    Nervousnet nervousnet;
+    iSensorSource dataSource;
+
     state.State state;
+
     public boolean isRunning = false;
+
     private static long lastClusteringTimestamp;    // epoch in milliseconds
     private static final long clusteringPeriodInMillisec = 5000;  // in milliseconds
 
+    private static int sleepTime = 100;
+
     public static int id = 0;
 
-    public PeriodicExecution(state.State state, ArrayList<Point> points, Clustering clustering, Nervousnet nervousnet){
+    public PeriodicExecution(state.State state, ArrayList<Point> points, Clustering clustering, iSensorSource dataSource){
         this.points = points;
         this.clustering = clustering;
-        this.nervousnet = nervousnet;
+        this.dataSource = dataSource;
         this.state = state;             // we'll be updating state.possibleStates periodically
         isRunning = true;
     }
@@ -40,9 +45,6 @@ public class PeriodicExecution extends Thread {
         Log.d("PERIODICITY", "Start periodic execution ...");
         this.isRunning = true;
 
-        id ++;
-        int initRecomputeIterations = 50;
-        int recomputeIterations = initRecomputeIterations;
         ArrayList<Point> newPoints = new ArrayList<>();
 
         long currentTimestamp;
@@ -50,18 +52,13 @@ public class PeriodicExecution extends Thread {
         while (this.isRunning) {
             // pause
             try {
-                Thread.sleep(100);
+                Thread.sleep(this.sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             // get latest data
-            //double latestValue = (double) nervousnet.getSimulatedValue();
-            NervousnetSensorPoint latestPoint = nervousnet.getLatestLightValue();
-
-            // classify
-            double[] coordinates = latestPoint.getValues(); //TODO: get real data, and timestamp
-            Point newPoint = new Point(coordinates, latestPoint);
+            Point newPoint = DataHandler.getNextDataPoint( dataSource );
             newPoints.add(newPoint);
             int clusterNum = clustering.classify(newPoint);
             Log.d("NEW_THREAD", "Goes to cluster " + clusterNum + " running:"+isRunning);
@@ -74,7 +71,7 @@ public class PeriodicExecution extends Thread {
                 Point tmp = null;
                 while (!points.isEmpty()){
                     tmp = points.get(0);
-                    NervousnetSensorPoint nsp = (NervousnetSensorPoint) tmp.getOriginalObject();
+                    SensorPoint nsp = (SensorPoint) tmp.getOriginalObject();
                     if (nsp.getTimestamp() < lastClusteringTimestamp)
                         points.remove(0);
                     else

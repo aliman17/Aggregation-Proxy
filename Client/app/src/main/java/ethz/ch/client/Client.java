@@ -12,13 +12,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import clusteringByWindow.Cluster;
 import clusteringByWindow.KMeans;
 import clusteringByWindow.Clustering;
-import clusteringByWindow.Point;
 import json.WriteJSON;
+import sensor.iSensorSource;
 import nervousnet.Nervousnet;
 import periodic.PeriodicExecutionHandler;
 import plot.GraphPlot;
@@ -27,7 +26,7 @@ import state.State;
 public class Client extends Activity {
 
     State state;
-    Nervousnet nervousnet;
+    iSensorSource dataSource;
     Clustering clustering;
     GraphPlot graph;
     int numOfClusters = 3;
@@ -60,8 +59,9 @@ public class Client extends Activity {
         buttonNervousnet.setOnClickListener(buttonNervousnetOnClickListener);
 
         // Get sensors data
-        nervousnet = new Nervousnet(this);
+        Nervousnet nervousnet = new Nervousnet(this);
         nervousnet.connect();
+        dataSource = nervousnet;
 
         // Clustering
         clustering = new KMeans(1, 3);
@@ -72,6 +72,7 @@ public class Client extends Activity {
         // Plot
         GraphView graph_view = (GraphView) findViewById(R.id.graph);
         graph = new GraphPlot(graph_view);
+
     }
 
     protected void initButtonConnectOnClickListener(Context context) {
@@ -92,13 +93,13 @@ public class Client extends Activity {
         this.buttonConnectOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                SendStatesButtonHandler myClientTask = new SendStatesButtonHandler(
-                        sendResponse,
-                        bundle.getString(dstAddress),
-                        bundle.getInt(dstPort),
-                        state);
-                myClientTask.execute();
-                Log.d("ACTIVITY-BUTTON", "Connect button successfully completed!");
+            SendStatesButtonHandler myClientTask = new SendStatesButtonHandler(
+                    sendResponse,
+                    bundle.getString(dstAddress),
+                    bundle.getInt(dstPort),
+                    state);
+            myClientTask.execute();
+            Log.d("ACTIVITY-BUTTON", "Connect button successfully completed!");
             }
         };
     }
@@ -111,7 +112,7 @@ public class Client extends Activity {
                 if (isRunning == false) {
                     isRunning = true;
                     buttonNervousnet.setText("Stop executing ...");
-                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler(state, clustering, nervousnet);
+                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler(state, clustering, dataSource);
                     perHandler.start();
                 }
                 else{
@@ -149,5 +150,20 @@ public class Client extends Activity {
         //TODO: state.setPossibleStates(dClusters);
 
         textNervousnet.setText(WriteJSON.serialize("possibleStates", state.getPossibleStates()));
+    }
+
+    public void continuousPlotting(){
+        while (true){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (PeriodicExecutionHandler.points != null
+                    && PeriodicExecutionHandler.clustering != null){
+                graph.plot(PeriodicExecutionHandler.points,
+                        PeriodicExecutionHandler.clustering.getClusters());
+            }
+        }
     }
 }

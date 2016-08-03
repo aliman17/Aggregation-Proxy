@@ -6,65 +6,47 @@ import java.util.ArrayList;
 
 import clusteringByWindow.Clustering;
 import clusteringByWindow.Point;
-import ethz.ch.client.Utils;
-import nervousnet.Nervousnet;
+import sensor.iSensorSource;
 import state.State;
 
 /**
  * Created by ales on 27/07/16.
  */
-public class PeriodicExecutionHandler {
+public class PeriodicExecutionHandler implements iPeriodicExecutionHandler {
 
     public static PeriodicExecution periodicExecution;
     public static ArrayList<Point> points;
     public static Clustering clustering;
     private State state;
-    Nervousnet nervousnet;
+    iSensorSource dataSource;
 
     public PeriodicExecutionHandler() {}
 
-    public PeriodicExecutionHandler(State state, Clustering clustering, Nervousnet nervousnet){
+    public PeriodicExecutionHandler(State state, Clustering clustering, iSensorSource dataSource){
         if (points == null)
             this.points = new ArrayList<>();
         this.clustering = clustering;
-        this.nervousnet = nervousnet;
+        this.dataSource = dataSource;
         this.state = state;
     }
 
-    public PeriodicExecutionHandler(ArrayList<Point> points, Nervousnet nervousnet){
-        this.points = points;
-        //this.clustering = clustering;
-        this.nervousnet = nervousnet;
-    }
-
+    /**
+     * Initializes starting points and starts periodic execution of update and clustering
+     */
     public void start() {
-
+        // If periodic execution doesn't exist, create one
         if (periodicExecution == null){
             Log.d("BUTTON", "Nervousnet button pressed and is under execution ...");
-            // TODO: get data from nervousnet. Real data, not simulated one.
             points.clear();
-            points.addAll( Utils.initialClusteringPoints() ); // We don't want to lose reference
-                                                // we want changes to be visible outside
-                                                // of the this class too,
-                                                // for instance for plotting
+            points.addAll( DataHandler.getInitData( dataSource ) );
             clustering.compute(points);
-            periodicExecution = new PeriodicExecution(state, points, clustering, nervousnet);
+            periodicExecution = new PeriodicExecution(state, points, clustering, dataSource);
             periodicExecution.start();
         }
-        else {
-            //buttonNervousnet.setText("Stopping ...");
-            periodicExecution.stopExecution();
-            try {
-                periodicExecution.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            periodicExecution = null;
-        }
-            //buttonNervousnet.setText("Get nervousnet data");
     }
 
     public void stop(){
+        // Stop existing periodic execution
         if (periodicExecution != null){
             periodicExecution.stopExecution();
             try {

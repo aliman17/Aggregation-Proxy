@@ -2,9 +2,6 @@ package ethz.ch.client;
 
 import android.util.Log;
 
-import com.jjoe64.graphview.GraphView;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,8 +9,7 @@ import clusteringByWindow.Cluster;
 import clusteringByWindow.Clustering;
 import clusteringByWindow.KMeans;
 import clusteringByWindow.Point;
-import json.WriteJSON;
-import nervousnet.NervousnetSensorPoint;
+import sensor.SensorPoint;
 import plot.GraphPlot;
 
 /**
@@ -89,7 +85,7 @@ public class Utils {
         for(int i = 0; i < 10; i++)   { ;
             Random rand = new Random();
             double[] coordinates = {rand.nextDouble() * 600, 1};
-            NervousnetSensorPoint nsp = new NervousnetSensorPoint(0, System.currentTimeMillis(), coordinates);
+            SensorPoint nsp = new SensorPoint(0, System.currentTimeMillis(), coordinates);
             points.add(new Point(coordinates, nsp));
         }
         return points;

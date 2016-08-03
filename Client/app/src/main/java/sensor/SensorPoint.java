@@ -1,20 +1,23 @@
-package nervousnet;
+package sensor;
 
 /**
- * Created by ales on 28/07/16.
+ * Created by ales on 03/08/16.
  */
-public class NervousnetSensorPoint {
+public class SensorPoint {
     private int sensorType;
     private long timestamp;
     private double[] values;
+    private int dimensions;
 
-    public NervousnetSensorPoint(int type, long timestamp, double[] values){
+    public SensorPoint(int type, long timestamp, double[] values){
         this.sensorType = type;
         this.timestamp = timestamp;
         this.values = values;
+        this.dimensions = values.length;
     }
 
     public int getSensorType()  { return sensorType; }
+    public int getDimensions()  { return this.dimensions; }
     public long getTimestamp()  { return timestamp; }
     public double[] getValues() { return values; }
 }

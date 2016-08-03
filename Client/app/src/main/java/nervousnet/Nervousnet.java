@@ -8,26 +8,24 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.DeadObjectException;
 import android.os.IBinder;
-import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
 import ch.ethz.coss.nervousnet.lib.LightReading;
 import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
-import ch.ethz.coss.nervousnet.lib.SensorReading;
 import ch.ethz.coss.nervousnet.lib.Utils;
+import sensor.SensorPoint;
+import sensor.iSensorSource;
 
 /**
  * Created by ales on 28/06/16.
  */
-public class Nervousnet {
+public class Nervousnet implements iSensorSource {
 
     // We need context to get connections and sensor data
     private Context context;
@@ -115,15 +113,15 @@ public class Nervousnet {
 
 
 
-    public NervousnetSensorPoint getLatestLightValue(){
+    public SensorPoint getLatestLightValue(){
         LightReading lReading = null;
-        Log.d("NERVOUSNET", "Getting light value ...");
         try {
             lReading = (LightReading) mService.getLatestReading(LibConstants.SENSOR_LIGHT);
             long timestamp = lReading.timestamp;
             double[] values = {lReading.getLuxValue()};
             int type = lReading.type;
-            return new NervousnetSensorPoint(type, timestamp, values);
+            Log.d("NERVOUSNET", "Getting light value ... " + values[0]);
+            return new SensorPoint(type, timestamp, values);
         } catch (DeadObjectException doe) {
             // TODO Auto-generated catch block
             doe.printStackTrace();
@@ -135,20 +133,27 @@ public class Nervousnet {
         return null;
     }
 
+    @Override
+    public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime) {
+        // TODO: get real data
+        ArrayList<SensorPoint> values = new ArrayList<>();
+        for(int i = 0; i < 50; i++)
+            values.add(getLatestLightValue());
+        return values;
+    }
 
-   /* public float getLatestAccValue(){
-        // TODO: throws error, that it can't be casted ot AccelometerReading
-
+    public SensorPoint getLatestAccValue(){
+        // TODO: doesn't work properly
         AccelerometerReading lReading = null;
-        Log.d("MSERVICE_2", mService+"");
+        Log.d("NERVOUSNET", "Getting acc value ...");
         try {
             lReading = (AccelerometerReading) mService.getLatestReading(LibConstants.SENSOR_ACCELEROMETER);
-            if (lReading != null) {
-                Log.d("Nervousnet", "Light=" + lReading.getX());
-                return lReading.getX();
-            } else {
-                Log.d("Light object is null", "");
-            }
+            //lReading = (AccelerometerReading) mService.getLatestReading(LibConstants.SENSOR_ACCELEROMETER);
+            long timestamp = lReading.timestamp;
+            //double[] values = {lReading.getX(), lReading.getY(), lReading.getZ()};
+            double[] values = {1, 2, 3};
+            int type = lReading.type;
+            return new SensorPoint(type, timestamp, values);
         } catch (DeadObjectException doe) {
             // TODO Auto-generated catch block
             doe.printStackTrace();
@@ -156,9 +161,17 @@ public class Nervousnet {
             e.printStackTrace();
         } catch (NullPointerException e){
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return -1;
-    }*/
+        return null;
+    }
+
+    @Override
+    public ArrayList<SensorPoint> getAccValues(long startTime, long stopTime) {
+        return null;
+    }
+
 
     /*public ArrayList<Double> getLightValues(int n){
 
