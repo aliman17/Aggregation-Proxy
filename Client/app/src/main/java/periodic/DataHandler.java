@@ -14,11 +14,13 @@ import sensor.iSensorSource;
 public class DataHandler {
 
     private static boolean bLight = true;
-    private static boolean bBattery = false;
+    private static boolean bBattery = true;
     private static boolean bNoise = true;
 
     public static Point getNextDataPoint(iSensorSource dataSource) {
         ArrayList<SensorPoint> listOfSensors = new ArrayList<>();
+
+        // The ORDER is important. Only first two dimensions will be plotted.
 
         // Get data from all sensors you want and create multidimensional point
         if (bLight) {
@@ -26,14 +28,14 @@ public class DataHandler {
             listOfSensors.add(lightValues);
         }
 
-        if (bBattery) {
-            SensorPoint batteryValues = dataSource.getLatestBatteryValue();
-            listOfSensors.add(batteryValues);
-        }
-
         if (bNoise) {
             SensorPoint noiseValues = dataSource.getLatestNoiseValue();
             listOfSensors.add(noiseValues);
+        }
+
+        if (bBattery) {
+            SensorPoint batteryValues = dataSource.getLatestBatteryValue();
+            listOfSensors.add(batteryValues);
         }
 
         MultiSensorPoint ms = new MultiSensorPoint(listOfSensors);
