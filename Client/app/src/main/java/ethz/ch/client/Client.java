@@ -64,7 +64,7 @@ public class Client extends Activity {
         dataSource = nervousnet;
 
         // Clustering
-        clustering = new KMeans(1, 3);
+        clustering = new KMeans(numOfDimensions, numOfClusters);
 
         // Initialize state of the client
         state = new State(this);

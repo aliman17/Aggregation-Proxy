@@ -1,42 +1,37 @@
 package nervousnet;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.net.Uri;
-import android.os.DeadObjectException;
-import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
+
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
+import ch.ethz.coss.nervousnet.lib.BatteryReading;
+import ch.ethz.coss.nervousnet.lib.ErrorReading;
 import ch.ethz.coss.nervousnet.lib.LibConstants;
 import ch.ethz.coss.nervousnet.lib.LightReading;
-import ch.ethz.coss.nervousnet.lib.NervousnetRemote;
-import ch.ethz.coss.nervousnet.lib.Utils;
+import ch.ethz.coss.nervousnet.lib.NervousnetSensorDataListener;
+import ch.ethz.coss.nervousnet.lib.NervousnetServiceConnectionListener;
+import ch.ethz.coss.nervousnet.lib.NervousnetServiceController;
+import ch.ethz.coss.nervousnet.lib.NoiseReading;
+import ch.ethz.coss.nervousnet.lib.RemoteCallback;
+import ch.ethz.coss.nervousnet.lib.SensorReading;
 import sensor.SensorPoint;
 import sensor.iSensorSource;
 
 /**
  * Created by ales on 28/06/16.
  */
-public class Nervousnet implements iSensorSource {
+public class Nervousnet implements iSensorSource, NervousnetServiceConnectionListener, NervousnetSensorDataListener {
 
     // We need context to get connections and sensor data
     private Context context;
 
     // Connection to the service
-    protected NervousnetRemote mService;
-    private   ServiceConnection mServiceConnection;
-    private   Boolean bindFlag;
-
-    // Data
-    private ArrayList<Double> lightData;
+    NervousnetServiceController nervousnetServiceController;
 
     // Constructor
     public Nervousnet(Context context){
@@ -45,89 +40,38 @@ public class Nervousnet implements iSensorSource {
 
     // Connect
     public void connect(){
-        initConnection();
-        doBindService();
+        nervousnetServiceController = new NervousnetServiceController(this.context, this);
+        nervousnetServiceController.connect();
     }
 
-    // 1) Initialize connection
-    public void initConnection(){
-        mServiceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder service) {
-                mService = NervousnetRemote.Stub.asInterface(service);
-                Toast.makeText(context.getApplicationContext(),
-                        "NervousnetRemote Service connected", Toast.LENGTH_SHORT).show();
-                Log.d("MSERVICE_1", mService+"");
-            }
+    public SensorPoint getLatestNoiseValue(){
+        NoiseReading lReading;
 
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-                mService = null;
-                mServiceConnection = null;
-                Toast.makeText(context.getApplicationContext(),
-                        "NervousnetRemote Service disconnected", Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
-
-    // 2) Bind service to the mService
-    public void doBindService(){
-        Intent it = new Intent();
-        it.setClassName("ch.ethz.coss.nervousnet.hub",
-                "ch.ethz.coss.nervousnet.hub.NervousnetHubApiService");
-        if (mService == null)
-            bindFlag = context.bindService(it, mServiceConnection, 0);
-    }
-
-    // 3) Unbind service when needed
-    public void doUnbindService(){
-        context.unbindService(mServiceConnection);
-        bindFlag = false;
-    }
-
-    public void checkBinding(){
-        if (!bindFlag){
-            Utils.displayAlert(context, "Alert",
-                    "Nervousnet HUB application is required to be installed and running to use " +
-                            "this app. If not installed please download it from the App Store. " +
-                            "If already installed, please turn on the Data Collection option " +
-                            "inside the Nervousnet HUB application.",
-                    "Download Now", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            try {
-                                context.startActivity(new Intent(Intent.ACTION_VIEW,
-                                        Uri.parse("market://details?id=ch.ethz.coss.nervousnet.hub")));
-                            } catch (android.content.ActivityNotFoundException anfe) {
-                                context.startActivity(new Intent(Intent.ACTION_VIEW,
-                                        Uri.parse("https://play.google.com/store/apps/details?id=ch.ethz.coss.nervousnet.hub")));
-                            }
-
-                        }
-                    }, "Exit", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            System.exit(0);
-                        }
-                    });
+        try{
+            lReading  = (NoiseReading) nervousnetServiceController.getLatestReading(LibConstants.SENSOR_NOISE);
+            long timestamp = lReading.timestamp;
+            double[] values = {lReading.getdbValue()};
+            int type = lReading.type;
+            Log.d("NERVOUSNET", "Getting noise value ... " + values[0]);
+            return new SensorPoint(type, timestamp, values);
+        } catch (Exception e){
+            e.printStackTrace();
         }
+        return null;
     }
-
 
 
     public SensorPoint getLatestLightValue(){
-        LightReading lReading = null;
-        try {
-            lReading = (LightReading) mService.getLatestReading(LibConstants.SENSOR_LIGHT);
+        LightReading lReading;
+
+        try{
+            lReading  = (LightReading)nervousnetServiceController.getLatestReading(LibConstants.SENSOR_LIGHT);
             long timestamp = lReading.timestamp;
             double[] values = {lReading.getLuxValue()};
             int type = lReading.type;
             Log.d("NERVOUSNET", "Getting light value ... " + values[0]);
             return new SensorPoint(type, timestamp, values);
-        } catch (DeadObjectException doe) {
-            // TODO Auto-generated catch block
-            doe.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e){
+        } catch (Exception e){
             e.printStackTrace();
         }
         return null;
@@ -142,25 +86,39 @@ public class Nervousnet implements iSensorSource {
         return values;
     }
 
-    public SensorPoint getLatestAccValue(){
-        // TODO: doesn't work properly
-        AccelerometerReading lReading = null;
-        Log.d("NERVOUSNET", "Getting acc value ...");
+    public SensorPoint getLatestBatteryValue(){
+        BatteryReading lReading = null;
         try {
-            lReading = (AccelerometerReading) mService.getLatestReading(LibConstants.SENSOR_ACCELEROMETER);
-            //lReading = (AccelerometerReading) mService.getLatestReading(LibConstants.SENSOR_ACCELEROMETER);
+            lReading  = (BatteryReading) nervousnetServiceController.getLatestReading(LibConstants.SENSOR_BATTERY);
             long timestamp = lReading.timestamp;
-            //double[] values = {lReading.getX(), lReading.getY(), lReading.getZ()};
-            double[] values = {1, 2, 3};
+            double[] values = {lReading.getPercent()};
             int type = lReading.type;
+            Log.d("NERVOUSNET", "Getting battery value ... " + values[0]);
             return new SensorPoint(type, timestamp, values);
-        } catch (DeadObjectException doe) {
-            // TODO Auto-generated catch block
-            doe.printStackTrace();
-        } catch (RemoteException e) {
+        } catch (Exception e){
             e.printStackTrace();
-        } catch (NullPointerException e){
-            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public ArrayList<SensorPoint> getBatteryValues(long startTime, long stopTime) {
+        // TODO: get real data
+        ArrayList<SensorPoint> values = new ArrayList<>();
+        for(int i = 0; i < 50; i++)
+            values.add(getLatestBatteryValue());
+        return values;
+    }
+
+    public SensorPoint getLatestAccValue(){
+        AccelerometerReading lReading = null;
+        try {
+            lReading  = (AccelerometerReading) nervousnetServiceController.getLatestReading(LibConstants.SENSOR_ACCELEROMETER);
+            long timestamp = lReading.timestamp;
+            double[] values = {lReading.getX(), lReading.getY(), lReading.getZ()};
+            int type = lReading.type;
+            Log.d("NERVOUSNET", "Getting acc value ..." + values[0] + " " + values[1] + " " + values[2]);
+            return new SensorPoint(type, timestamp, values);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -169,7 +127,65 @@ public class Nervousnet implements iSensorSource {
 
     @Override
     public ArrayList<SensorPoint> getAccValues(long startTime, long stopTime) {
+
+        final RemoteCallback.Stub cbBinder = new RemoteCallback.Stub() {
+
+            @Override
+            public void success(List list) throws RemoteException {
+                        SensorReading lReading = null;
+                Log.d("LightmeterActivity", "GREAT1!!!");
+                if(list.size() > 0)
+                            lReading = (SensorReading) list.get(0);
+                if(lReading != null) {
+                    if(lReading instanceof LightReading)
+                        Log.d("LightmeterActivity", "GREAT!!!");
+                    if(lReading instanceof AccelerometerReading)
+                        Log.d("LightmeterActivity", "GREAT!!!");
+
+                }else {
+                    Log.d("LightmeterActivity", "BAD");
+                }
+
+            }
+
+            @Override
+
+            public void failure(ErrorReading reading) throws RemoteException {
+                Log.d("LightmeterActivity", "FAILURE");
+            }
+
+        };
+
+        try {
+            nervousnetServiceController.mService.getReadings(
+                    LibConstants.SENSOR_ACCELEROMETER,
+                    startTime,
+                    stopTime,
+                    cbBinder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
+    }
+
+    @Override
+    public void onSensorDataReady(SensorReading reading) {
+
+    }
+
+    @Override
+    public void onServiceConnected() {
+
+    }
+
+    @Override
+    public void onServiceDisconnected() {
+
+    }
+
+    @Override
+    public void onServiceConnectionFailed() {
+
     }
 
 

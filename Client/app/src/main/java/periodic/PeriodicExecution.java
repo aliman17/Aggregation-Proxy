@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import clusteringByWindow.Cluster;
 import clusteringByWindow.Clustering;
 import clusteringByWindow.Point;
+import sensor.MultiSensorPoint;
 import sensor.SensorPoint;
 import sensor.iSensorSource;
 import state.PossibleStatePoint;

@@ -109,7 +109,7 @@ public class GraphPlot {
 
         // Plot clusters
         PointsGraphSeries<DataPoint> point_series2 = new PointsGraphSeries<DataPoint>(clusters);
-        point_series2.setShape(PointsGraphSeries.Shape.POINT);
+        point_series2.setShape(PointsGraphSeries.Shape.TRIANGLE);
         point_series2.setColor(Color.RED);
         point_series2.setSize(10);
 

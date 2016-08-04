@@ -11,4 +11,9 @@ public interface iSensorSource {
 
     public SensorPoint getLatestAccValue();
     public ArrayList<SensorPoint> getAccValues(long startTime, long stopTime);
+
+    public SensorPoint getLatestBatteryValue();
+    public ArrayList<SensorPoint> getBatteryValues(long startTime, long stopTime);
+
+    public SensorPoint getLatestNoiseValue();
 }

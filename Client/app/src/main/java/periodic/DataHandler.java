@@ -2,6 +2,7 @@ package periodic;
 
 import java.util.ArrayList;
 
+import ch.ethz.coss.nervousnet.lib.LibConstants;
 import clusteringByWindow.Point;
 import sensor.MultiSensorPoint;
 import sensor.SensorPoint;
@@ -12,30 +13,42 @@ import sensor.iSensorSource;
  */
 public class DataHandler {
 
+    private static boolean bLight = true;
+    private static boolean bBattery = false;
+    private static boolean bNoise = true;
+
     public static Point getNextDataPoint(iSensorSource dataSource) {
         ArrayList<SensorPoint> listOfSensors = new ArrayList<>();
 
         // Get data from all sensors you want and create multidimensional point
-        SensorPoint light = dataSource.getLatestLightValue();
-        listOfSensors.add(light);
+        if (bLight) {
+            SensorPoint lightValues = dataSource.getLatestLightValue();
+            listOfSensors.add(lightValues);
+        }
+
+        if (bBattery) {
+            SensorPoint batteryValues = dataSource.getLatestBatteryValue();
+            listOfSensors.add(batteryValues);
+        }
+
+        if (bNoise) {
+            SensorPoint noiseValues = dataSource.getLatestNoiseValue();
+            listOfSensors.add(noiseValues);
+        }
+
         MultiSensorPoint ms = new MultiSensorPoint(listOfSensors);
 
         return new Point(ms.getValues(), ms);
     }
 
     public static ArrayList<Point> getInitData(iSensorSource dataSource) {
-        // Get data
-        ArrayList<SensorPoint> sensors = dataSource.getLightValues(1470111256, 1470211256);
 
-        // Combine somehow into multidimensional points and create points
-        // TODO: for now we use only light
-        
         ArrayList<Point> points = new ArrayList<>();
-        for (SensorPoint s : sensors){
-            Point p = new Point(s.getValues(), s);
-            points.add(p);
-        }
 
+        for( int i = 0; i < 50; i++) {
+            Point newPoint = getNextDataPoint(dataSource);
+            points.add(newPoint);
+        }
         return points;
     }
 }

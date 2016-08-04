@@ -4,10 +4,12 @@ package sensor;
  * Created by ales on 03/08/16.
  */
 public class SensorPoint {
-    private int sensorType;
-    private long timestamp;
-    private double[] values;
-    private int dimensions;
+    protected int sensorType;
+    protected long timestamp;
+    protected double[] values;
+    protected int dimensions;
+
+    public SensorPoint(){}
 
     public SensorPoint(int type, long timestamp, double[] values){
         this.sensorType = type;

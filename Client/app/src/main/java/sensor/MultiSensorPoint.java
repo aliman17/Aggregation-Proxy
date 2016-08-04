@@ -5,31 +5,32 @@ import java.util.ArrayList;
 /**
  * Created by ales on 03/08/16.
  */
-public class MultiSensorPoint {
-    private long timestamp;     // average of all timestamps
-    private int dimensions;     // sum of all points dimensions
-    private double[] values;    // values of all points
+public class MultiSensorPoint extends SensorPoint {
 
     public MultiSensorPoint(ArrayList<SensorPoint> points){
+        // Determine type, we just set to -1
+        this.sensorType = -1;
+
         // Determine dimensions
-        dimensions = 0;
-        timestamp = 0;
+        int dimensions = 0;
+        long timestamp = 0;
         for (SensorPoint p : points) {
             dimensions += p.getDimensions();
             timestamp += p.getTimestamp();
         }
         timestamp /= dimensions;
+        this.dimensions = dimensions;
+        this.timestamp = timestamp;
 
         // Set values
-        values = new double[dimensions];
+        double[] values = new double[dimensions];
         int i = 0;
         for (SensorPoint p : points) {
             double[] pValues = p.getValues();
             for (int j = 0; j < pValues.length; j++)
                 values[i++] = pValues[j];
         }
-    }
+        this.values = values;
 
-    public int getDimensions(){ return this.dimensions; }
-    public double[] getValues() { return this.values; }
+    }
 }
