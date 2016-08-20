@@ -2,50 +2,38 @@ package clustering;
 
 /**
  * Created by ales on 27/06/16.
+ *
+ * Algorithm for clustering, implements class Clustering.
  */
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
-public class KMeans implements Clustering{
+public class KMeans implements Clustering {
 
-    private int NUM_CLUSTERS = 3;
+    private int numOfClusters;
+    private int numOfDimensions;
+    private ArrayList<Cluster> clusters;
 
-    public KMeans() {}
-
-    private void initClusters(ArrayList clusters, ArrayList<Point> points){
-
-        // Find min and max
-        Point minpoint = points.get(0);
-        Point maxpoint = points.get(0);
-        for (Point p : points){
-            double pValue = p.getX();
-            if (pValue < minpoint.getX())
-                minpoint = p;
-            if (pValue > maxpoint.getX())
-                maxpoint = p;
-        }
-
-        // Set centroids equidistand along the x-axis in the range of the data points
-        double h = (maxpoint.getX() - minpoint.getX()) / NUM_CLUSTERS; // bandwidth
-        for (int i = 0; i < NUM_CLUSTERS; i++) {
-            Cluster cluster = new Cluster(i);
-            Point centroid = new Point(minpoint.getX() + i*h + h/2);
-            cluster.setCentroid(centroid);
-            clusters.add(cluster);
-            Log.d("KMEANS-init-controids", centroid.getX()+"");
-        }
+    public KMeans(int numOfDimensions, int numOfClusters) {
+        this.numOfDimensions = numOfDimensions;
+        this.numOfClusters = numOfClusters;
     }
 
     //The process to calculate the K Means, with iterating method.
     @Override
     public ArrayList<Cluster> compute(ArrayList<Point> points) {
 
-        ArrayList<Cluster> clusters = new ArrayList();
+        Log.d("KMEANS", "Start computing clusters ...");
+
         boolean finish = false;
 
-        initClusters(clusters, points);
+        initClusters(points);
+
+        if (points.size() <= 0) finish = true;
 
         // Add in new data, one at a time, recalculating centroids with each new one.
         while(!finish) {
@@ -55,6 +43,7 @@ public class KMeans implements Clustering{
             List<Point> lastCentroids = getCentroids(clusters);
 
             //Assign points to the closer cluster
+            boolean trainingPhase = true;
             assignCluster(points, clusters);
 
             //Calculate new centroids
@@ -65,16 +54,83 @@ public class KMeans implements Clustering{
             //Calculates total distance between new and old Centroids
             double distance = 0;
             for(int i = 0; i < lastCentroids.size(); i++)
-                distance += Point.distance(lastCentroids.get(i), currentCentroids.get(i));
+                distance += Point.distance(this.numOfDimensions, lastCentroids.get(i), currentCentroids.get(i));
 
             if(distance == 0) {
                 finish = true;
             }
+            if(Double.isNaN(distance))
+                finish = true;
+            Log.d("KMEAN", "Cluster diff ... "+distance);
         }
 
         for(Cluster c : clusters)
-            Log.d("KMEANS-final-centroids", c.getCentroid().getX() + "");
+            Log.d("KMEANS-final-centroids", Arrays.toString(c.getCentroid().getCoordinates()) + "");
+
+        Log.d("KMEANS", "Computing clusters finished!");
         return clusters;
+    }
+
+    @Override
+    public int[] classify(ArrayList<Point> points) {
+
+        int[] classes = new int[points.size()];
+        int i = 0;
+        if (this.clusters != null){
+            for(Point point : points) {
+                int cluster = classify(point);
+                point.setCluster(cluster);
+                classes[i] = cluster;
+                i++;
+            }
+        }
+        Log.d("KMEANS", "New point classified!");
+        return classes;
+    }
+
+    @Override
+    public int classify(Point point) {
+        double min = Double.MAX_VALUE;
+        int cluster = 0;
+
+        for(int i = 0; i < this.numOfClusters; i++) {
+            Cluster c = clusters.get(i);
+            double distance = Point.distance(this.numOfDimensions, point, c.getCentroid());
+            if(distance < min){
+                min = distance;
+                cluster = i;
+            }
+        }
+        return cluster;
+    }
+
+    @Override
+    public ArrayList<Cluster> getClusters() {
+        return this.clusters;
+    }
+
+
+    private void initClusters(ArrayList<Point> points){
+
+        clusters = new ArrayList<Cluster>();
+        int sizeOfPoints = points.size();
+        Random rand = new Random();
+
+        // Choose random centroids
+        for (int i = 0; i < this.numOfClusters; i++){
+            // Get one of the points as an initial cluster
+            Integer newRandomInt = rand.nextInt(sizeOfPoints);
+            Point point = points.get(newRandomInt);
+            double[] coordinates = point.getCoordinates();
+            // Just add a little bit of disturbation into the first coordinate
+            // so that clusters don't overlap in case of selecting the same point
+            // several times
+            coordinates[0] += coordinates[0] * rand.nextDouble();
+            Point centroid = new Point(coordinates);
+            Cluster c = new Cluster(i, centroid);
+            clusters.add(c);
+            Log.d("KMEANS-init-centroids", Arrays.toString(c.getCentroid().getCoordinates()) + "");
+        }
     }
 
     private void clearClusters(ArrayList<Cluster> clusters) {
@@ -83,28 +139,15 @@ public class KMeans implements Clustering{
         }
     }
 
-    private List<Point> getCentroids(ArrayList<Cluster> clusters) {
-        List centroids = new ArrayList();
+    private ArrayList<Point> getCentroids(ArrayList<Cluster> clusters) {
+        ArrayList centroids = new ArrayList();
         for(Cluster cluster : clusters) centroids.add(cluster.getCentroid());
         return centroids;
     }
 
     private void assignCluster(List<Point> points, ArrayList<Cluster> clusters) {
-        double max = Double.MAX_VALUE;
-        double min = max;
-        int cluster = 0;
-        double distance = 0.0;
-
         for(Point point : points) {
-            min = max;
-            for(int i = 0; i < NUM_CLUSTERS; i++) {
-                Cluster c = clusters.get(i);
-                distance = Point.distance(point, c.getCentroid());
-                if(distance < min){
-                    min = distance;
-                    cluster = i;
-                }
-            }
+            int cluster = classify(point);
             point.setCluster(cluster);
             clusters.get(cluster).addPoint(point);
         }
@@ -112,19 +155,59 @@ public class KMeans implements Clustering{
 
     private void calculateCentroids(ArrayList<Cluster> clusters) {
         for(Cluster cluster : clusters) {
-            double sumX = 0;
-            List<Point> list = cluster.getPoints();
-            int n_points = list.size();
 
-            for(Point point : list) {
-                sumX += point.getX();
+            ArrayList<Point> points = cluster.getPoints();
+            int n_points = points.size();
+            double[] sum = new double[this.numOfDimensions];  // initialized to 0;
+
+            for(Point point : points) {
+                double[] coordinates = point.getCoordinates();
+                for (int dim = 0; dim < this.numOfDimensions; dim++){
+                    sum[dim] += coordinates[dim];
+                }
             }
 
-            Point centroid = cluster.getCentroid();
-            if(n_points > 0) {
-                double newX = sumX / n_points;
-                centroid.setX(newX);
-            }
+            // Average it
+            for (int dim = 0; dim < this.numOfDimensions; dim++)
+                sum[dim] = sum[dim] / n_points;
+
+            // Set cluster to new coordinates
+            cluster.setCentroid(sum);
         }
     }
+
+
+
+    private double[] generateMinCoord(ArrayList<Point> points){
+        int size = points.size();
+        int nOfDimensions = points.get(0).getDimensions();
+        double[] minCoord = points.get(0).getCoordinates();
+        double[] curCoord = null;
+
+        for (int i = 0; i < size; i++){
+            curCoord = points.get(i).getCoordinates();
+            for (int dim = 0; dim < nOfDimensions; dim++){
+                if (curCoord[dim] < minCoord[dim])
+                    minCoord[dim] = curCoord[dim];
+            }
+        }
+        return minCoord;
+    }
+
+    private double[] generateMaxCoord(ArrayList<Point> points){
+        int size = points.size();
+        int nOfDimenstions = points.get(0).getDimensions();
+        double[] maxCoord = points.get(0).getCoordinates();
+        double[] curCoord = null;
+
+        for (int i = 0; i < size; i++){
+            curCoord = points.get(i).getCoordinates();
+            for (int dim = 0; dim < nOfDimenstions; dim++){
+                if (curCoord[dim] > maxCoord[dim])
+                    maxCoord[dim] = curCoord[dim];
+            }
+        }
+        return maxCoord;
+    }
+
 }

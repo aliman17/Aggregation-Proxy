@@ -2,7 +2,6 @@ package plot;
 
 import android.graphics.Color;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
@@ -12,9 +11,8 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 
 import java.util.ArrayList;
 
-import clusteringByWindow.Cluster;
-import clusteringByWindow.Point;
-import ethz.ch.client.Client;
+import clustering.Cluster;
+import clustering.Point;
 
 /**
  * Created by ales on 19/07/16.

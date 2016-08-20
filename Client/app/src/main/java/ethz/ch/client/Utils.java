@@ -5,10 +5,10 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Random;
 
-import clusteringByWindow.Cluster;
-import clusteringByWindow.Clustering;
-import clusteringByWindow.KMeans;
-import clusteringByWindow.Point;
+import clustering.Cluster;
+import clustering.Clustering;
+import clustering.KMeans;
+import clustering.Point;
 import sensor.SensorPoint;
 import plot.GraphPlot;
 

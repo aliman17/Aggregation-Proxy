@@ -1,6 +1,7 @@
 package json.messages;
 
 import json.enums.MessageTypes;
+import state.PossibleStatePoint;
 
 /**
  * Represents a message for setting new selected state
@@ -10,7 +11,7 @@ import json.enums.MessageTypes;
  */
 public class SelectedStateMessage extends BaseMessage{
 	
-	public double selectedState;
+	public PossibleStatePoint selectedState;
 	
 	public SelectedStateMessage() {
 		super();
@@ -23,7 +24,7 @@ public class SelectedStateMessage extends BaseMessage{
 	}
 	
 	public SelectedStateMessage(String srcIP, String dstIP, String srcID, String dstID,
-			double selectedState) {
+			PossibleStatePoint selectedState) {
 		super(srcIP, dstIP, srcID, dstID);
 		this.type = MessageTypes.SELECTED_STATE_MSG;
 		this.selectedState = selectedState;

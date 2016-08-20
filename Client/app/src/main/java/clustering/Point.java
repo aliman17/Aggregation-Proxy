@@ -1,46 +1,83 @@
 package clustering;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
- * Created by ales on 27/06/16.
+ * Created by ales on 20/07/16.
+ * This class represents one point with its own coordinates. It keeps reference to
+ * the original object and cluster number.
  */
-
-
 public class Point {
+    private int numOfDimensions;
+    private double[] coordinates;
+    private Object referenceToOriginalObj;
+    private int clusterNumber;
 
-    private double x = 0;
-    private int cluster_number = 0;
-
-    public Point(double x)
-    {
-        this.setX(x);
+    public Point(double[] coordinates, Object referenceToOriginalObj){
+        this.numOfDimensions = coordinates.length;
+        this.coordinates = new double[this.numOfDimensions];
+        setCoordinates(coordinates);
+        this.referenceToOriginalObj = referenceToOriginalObj;
+        this.clusterNumber = -1;    // at the beginning, cluster number is unknown
+        // so we initialize to -1
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public Point(double[] coordinates){
+        this.numOfDimensions = coordinates.length;
+        this.coordinates = new double[this.numOfDimensions];
+        setCoordinates(coordinates);
+        this.referenceToOriginalObj = null;
+        this.clusterNumber = -1;    // at the beginning, cluster number is unknown
+        // so we initialize to -1
     }
 
-    public double getX()  {
-        return this.x;
+    public int getDimensions(){
+        return numOfDimensions;
     }
 
-    public void setCluster(int n) {
-        this.cluster_number = n;
+    public double[] getCoordinates(){
+        return this.coordinates;
     }
 
-    public int getCluster() {
-        return this.cluster_number;
+    public int getCluster(){
+        return clusterNumber;
     }
 
-    //Calculates the distance between two points.
-    protected static double distance(Point p1, Point p2) {
-        return Math.abs(p1.getX() - p2.getX());
+    public Object getOriginalObject() {
+        return this.referenceToOriginalObj;
     }
 
-    public String toString() {
-        return ""+x;
+    public void setCoordinate(int i, double value){
+        this.coordinates[i] = value;
+    }
+
+    public void setCoordinates(ArrayList<Double> coordinates){
+        for (int i = 0; i < numOfDimensions; i++)
+            this.coordinates[i] = coordinates.get(i);
+    }
+
+    public void setCoordinates(double[] coordinates){
+        // We copy the array, that changes on passed array do not effect Point
+        for (int i = 0; i < numOfDimensions; i++)
+            this.coordinates[i] = coordinates[i];
+    }
+
+    public void setCluster(int clusterNumber){
+        this.clusterNumber = clusterNumber;
+    }
+
+    public static double distance(int dimensions, Point p1, Point p2){
+        // Get data
+        double[] coord1 = p1.getCoordinates();
+        double[] coord2 = p2.getCoordinates();
+        // Sum of squares
+        double sum = 0;
+        for (int i = 0; i < dimensions; i++){
+            double diff = coord1[i] - coord2[i];
+            sum += diff * diff;
+        }
+        sum = Math.sqrt(sum);
+        // Return
+        return sum;
     }
 }

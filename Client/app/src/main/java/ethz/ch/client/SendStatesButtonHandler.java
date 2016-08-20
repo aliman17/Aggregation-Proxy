@@ -1,6 +1,7 @@
 package ethz.ch.client;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -41,26 +42,27 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
         Socket socket = null;
 
         try {
-            // Create new socket
-            socket = new Socket(dstAddress, dstPort);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             // Send possible states
 
-            // TODO
-
-            /*PossibleStatesMessage posStMsg = new PossibleStatesMessage(
+            PossibleStatesMessage posStMsg = new PossibleStatesMessage(
                     state.getClientIP(), state.getServerIP(), state.getClientID(),
                     state.getServerID(), state.getPossibleStates(), state.getInitState());
             String psm = WriteJSON.serialize("possibleStates", posStMsg);
-            out.println(psm);
+            Log.d("SEND", "Possible States Serialized - "+psm);
 
             // Send selected state
             SelectedStateMessage selStMsg = new SelectedStateMessage(
                     state.getClientIP(), state.getServerIP(), state.getClientID(),
                     state.getServerID(), state.getSelectedState());
             String ssm = WriteJSON.serialize("selectedState", selStMsg);
-            out.println(ssm);*/
+            Log.d("SEND", "Selected State Serialized - "+ssm);
+
+            // Create new socket
+            socket = new Socket(dstAddress, dstPort);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            out.println(psm);
+            out.println(ssm);
 
             response = "Sent";
         } catch (UnknownHostException e) {

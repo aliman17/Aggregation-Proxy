@@ -1,23 +1,21 @@
-package periodic;
+package data;
 
 import java.util.ArrayList;
 
-import ch.ethz.coss.nervousnet.lib.LibConstants;
-import clusteringByWindow.Point;
+import clustering.Point;
 import sensor.MultiSensorPoint;
 import sensor.SensorPoint;
-import sensor.iSensorSource;
 
 /**
  * Created by ales on 03/08/16.
  */
-public class DataHandler {
+public class DataSourceHelper {
 
     private static boolean bLight = true;
     private static boolean bBattery = true;
     private static boolean bNoise = true;
 
-    public static Point getNextDataPoint(iSensorSource dataSource) {
+    public static Point getNextDataPoint(iDataSource dataSource) {
         ArrayList<SensorPoint> listOfSensors = new ArrayList<>();
 
         // The ORDER is important. Only first two dimensions will be plotted.
@@ -43,7 +41,7 @@ public class DataHandler {
         return new Point(ms.getValues(), ms);
     }
 
-    public static ArrayList<Point> getInitData(iSensorSource dataSource) {
+    public static ArrayList<Point> getInitData(iDataSource dataSource) {
 
         ArrayList<Point> points = new ArrayList<>();
 

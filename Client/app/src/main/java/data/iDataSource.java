@@ -1,11 +1,13 @@
-package sensor;
+package data;
 
 import java.util.ArrayList;
+
+import sensor.SensorPoint;
 
 /**
  * Created by ales on 03/08/16.
  */
-public interface iSensorSource {
+public interface iDataSource {
     public SensorPoint getLatestLightValue();
     public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime);
 

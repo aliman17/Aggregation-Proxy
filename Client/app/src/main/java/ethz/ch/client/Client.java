@@ -12,13 +12,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
 
-import java.util.ArrayList;
-import clusteringByWindow.Cluster;
-import clusteringByWindow.KMeans;
-import clusteringByWindow.Clustering;
-import json.WriteJSON;
-import sensor.iSensorSource;
-import nervousnet.Nervousnet;
+import clustering.KMeans;
+import clustering.Clustering;
+import data.iDataSource;
+import data.Nervousnet;
 import periodic.PeriodicExecutionHandler;
 import plot.GraphPlot;
 import state.State;
@@ -26,7 +23,7 @@ import state.State;
 public class Client extends Activity {
 
     State state;
-    iSensorSource dataSource;
+    iDataSource dataSource;
     Clustering clustering;
     GraphPlot graph;
     int numOfClusters = 3;
@@ -124,46 +121,5 @@ public class Client extends Activity {
                 }
             }
         };
-    }
-
-    public void testData(){
-        // TODO: random points used
-        ArrayList points = Utils.randomPoints();
-
-        // Clustering
-        Clustering clustering = new KMeans(numOfDimensions, numOfClusters);
-        ArrayList<Cluster> clusters = clustering.compute(points);
-
-        // Plot
-        graph.plot(points, clusters);
-
-        // Set possible states
-        int n = clusters.size();
-        double[] dClusters = new double[n*numOfDimensions];
-        double[] curCoord = null;
-        for (int i = 0; i < n; i++) {
-            curCoord = clusters.get(i).getCentroid().getCoordinates();
-            for (int dim = 0; dim < numOfDimensions; dim++)
-                dClusters[i * numOfDimensions + dim] = curCoord[dim];
-        }
-
-        //TODO: state.setPossibleStates(dClusters);
-
-        textNervousnet.setText(WriteJSON.serialize("possibleStates", state.getPossibleStates()));
-    }
-
-    public void continuousPlotting(){
-        while (true){
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (PeriodicExecutionHandler.points != null
-                    && PeriodicExecutionHandler.clustering != null){
-                graph.plot(PeriodicExecutionHandler.points,
-                        PeriodicExecutionHandler.clustering.getClusters());
-            }
-        }
     }
 }

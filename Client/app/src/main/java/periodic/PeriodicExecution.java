@@ -4,12 +4,12 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import clusteringByWindow.Cluster;
-import clusteringByWindow.Clustering;
-import clusteringByWindow.Point;
-import sensor.MultiSensorPoint;
+import clustering.Cluster;
+import clustering.Clustering;
+import clustering.Point;
+import data.DataSourceHelper;
 import sensor.SensorPoint;
-import sensor.iSensorSource;
+import data.iDataSource;
 import state.PossibleStatePoint;
 
 /**
@@ -19,7 +19,7 @@ public class PeriodicExecution extends Thread {
 
     ArrayList<Point> points;
     Clustering clustering;
-    iSensorSource dataSource;
+    iDataSource dataSource;
 
     state.State state;
 
@@ -32,7 +32,7 @@ public class PeriodicExecution extends Thread {
 
     public static int id = 0;
 
-    public PeriodicExecution(state.State state, ArrayList<Point> points, Clustering clustering, iSensorSource dataSource){
+    public PeriodicExecution(state.State state, ArrayList<Point> points, Clustering clustering, iDataSource dataSource){
         this.points = points;
         this.clustering = clustering;
         this.dataSource = dataSource;
@@ -59,7 +59,7 @@ public class PeriodicExecution extends Thread {
             }
 
             // get latest data
-            Point newPoint = DataHandler.getNextDataPoint( dataSource );
+            Point newPoint = DataSourceHelper.getNextDataPoint( dataSource );
             newPoints.add(newPoint);
             int clusterNum = clustering.classify(newPoint);
             Log.d("NEW_THREAD", "Goes to cluster " + clusterNum + " running:"+isRunning);

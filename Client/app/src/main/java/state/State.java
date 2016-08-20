@@ -6,7 +6,9 @@ import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
 
-
+/**
+ * The class represents the state of the node (a phone or sth else).
+ */
 public class State {
 
 	private String 	clientIP;
@@ -14,7 +16,7 @@ public class State {
 	private String 	serverIP;
 	private String 	serverID;
 	private int 	serverPort;
-	private double 	initState;
+	private PossibleStatePoint 	initState;
 	private PossibleStatePoint selectedState;
 	private ArrayList<PossibleStatePoint> possibleStates;
 
@@ -25,7 +27,7 @@ public class State {
 		serverIP = "localhost";
 		serverID = "ExampleServerID";
 		serverPort = 8080;  // TODO: server IP and server port are specified in manifest, and that is used directly at the sending stage in Client
-		initState = 1;
+		initState = null;
 		//selectedState = 2;
 		possibleStates = new ArrayList<>();
 	}
@@ -36,7 +38,7 @@ public class State {
 	public String getServerIP()		{ return this.serverIP;  }
 	public int    getServerPort()	{ return this.serverPort;}
 	public String getServerID()		{ return this.serverID;  }
-	public double getInitState()	{ return this.initState; }
+	public PossibleStatePoint getInitState()	{ return this.initState; }
 	public PossibleStatePoint getSelectedState (){ return this.selectedState; }
 	public ArrayList<PossibleStatePoint> getPossibleStates(){ return this.possibleStates;}
 

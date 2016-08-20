@@ -2,7 +2,9 @@ package json.messages;
 
 import java.util.ArrayList;
 
+import json.WriteJSON;
 import json.enums.MessageTypes;
+import state.PossibleStatePoint;
 
 /**
  * Represents a message that includes list of possible states.
@@ -12,9 +14,9 @@ import json.enums.MessageTypes;
  *
  */
 public class PossibleStatesMessage extends BaseMessage {
-	
-	public double[] possibleStates;
-	public double initState;
+
+	public String possibleStatesJson;
+	public PossibleStatePoint initState;
 	
 	public PossibleStatesMessage() {
 		super();
@@ -26,10 +28,16 @@ public class PossibleStatesMessage extends BaseMessage {
 	}
 	
 	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID,
-								 double[] possibleStates, double initState) {
+								 ArrayList<PossibleStatePoint> possibleStates, PossibleStatePoint initState) {
 		super(srcIP, dstIP, srcID, dstID);
 		this.type = MessageTypes.POSSIBLE_STATES_MSG;
-		this.possibleStates = possibleStates;
+
+		String[] possibleStatesString = new String[possibleStates.size()];
+		for (int i = 0; i < possibleStatesString.length; i++){
+			possibleStatesString[i] = WriteJSON.serialize(""+i, possibleStates.get(i).values);
+		}
+		this.possibleStatesJson = WriteJSON.serialize("possibleStates",possibleStatesString);
+
 		this.initState = initState;
 	}
 	

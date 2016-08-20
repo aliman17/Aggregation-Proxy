@@ -4,9 +4,10 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import clusteringByWindow.Clustering;
-import clusteringByWindow.Point;
-import sensor.iSensorSource;
+import clustering.Clustering;
+import clustering.Point;
+import data.DataSourceHelper;
+import data.iDataSource;
 import state.State;
 
 /**
@@ -18,11 +19,11 @@ public class PeriodicExecutionHandler implements iPeriodicExecutionHandler {
     public static ArrayList<Point> points;
     public static Clustering clustering;
     private State state;
-    iSensorSource dataSource;
+    iDataSource dataSource;
 
     public PeriodicExecutionHandler() {}
 
-    public PeriodicExecutionHandler(State state, Clustering clustering, iSensorSource dataSource){
+    public PeriodicExecutionHandler(State state, Clustering clustering, iDataSource dataSource){
         if (points == null)
             this.points = new ArrayList<>();
         this.clustering = clustering;
@@ -38,7 +39,7 @@ public class PeriodicExecutionHandler implements iPeriodicExecutionHandler {
         if (periodicExecution == null){
             Log.d("BUTTON", "Nervousnet button pressed and is under execution ...");
             points.clear();
-            points.addAll( DataHandler.getInitData( dataSource ) );
+            points.addAll( DataSourceHelper.getInitData( dataSource ) );
             clustering.compute(points);
             periodicExecution = new PeriodicExecution(state, points, clustering, dataSource);
             periodicExecution.start();
