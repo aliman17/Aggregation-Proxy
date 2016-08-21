@@ -1,8 +1,10 @@
 package json.messages;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 
-import json.WriteJSON;
 import json.enums.MessageTypes;
 import state.PossibleStatePoint;
 
@@ -15,49 +17,44 @@ import state.PossibleStatePoint;
  */
 public class PossibleStatesMessage extends BaseMessage {
 
-	public String possibleStatesJson;
-	public PossibleStatePoint initState;
-	
-	public PossibleStatesMessage() {
-		super();
-	}
-	
-	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID) {
-		super(srcIP, dstIP, srcID, dstID);
-		this.type = MessageTypes.POSSIBLE_STATES_MSG;
-	}
+	public String message = "";
 	
 	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID,
 								 ArrayList<PossibleStatePoint> possibleStates, PossibleStatePoint initState) {
 		super(srcIP, dstIP, srcID, dstID);
-		this.type = MessageTypes.POSSIBLE_STATES_MSG;
 
-		String[] possibleStatesString = new String[possibleStates.size()];
-		for (int i = 0; i < possibleStatesString.length; i++){
-			possibleStatesString[i] = WriteJSON.serialize(""+i, possibleStates.get(i).values);
+		JSONObject obj = new JSONObject();
+
+
+
+		obj.put("type", MessageTypes.POSSIBLE_STATES_MSG);
+		obj.put("srcIP", srcIP);
+		obj.put("dstIP", dstIP);
+		obj.put("srcID", srcID);
+		obj.put("dstID", dstID);
+
+		JSONArray init = new JSONArray();
+		if (initState != null && initState.values != null)
+			for (double d : initState.values)
+				init.add(d);
+
+		obj.put("initState", init);
+
+		JSONArray states = new JSONArray();
+
+		for (PossibleStatePoint state : possibleStates) {
+			JSONArray coordinates = new JSONArray();
+			for (double d : state.values)
+				coordinates.add(d);
+			states.add(coordinates);
 		}
-		this.possibleStatesJson = WriteJSON.serialize("possibleStates",possibleStatesString);
 
-		this.initState = initState;
+		obj.put("possibleStates", states);
+
+
+		this.message = obj.toJSONString();
+
 	}
 	
-	/*
-	public String toString() {
-		StringBuilder sb = new StringBuilder("[\n");
-		sb.append(super.toString());
-		sb.append("\tpossible states = [ ");
-		if(possibleStates != null) {
-			for(int i = 0; i < possibleStates.length; i++) {
-				sb.append(possibleStates[i]);
-				if(i < possibleStates.length - 1) {
-					sb.append(", ");
-				}
-			}
-		}		
-		sb.append(" ]\n");		
-		sb.append("\tinit state = " + initState + "\n");
-		sb.append("]");
-		return sb.toString();
-	}
-	*/
+
 }

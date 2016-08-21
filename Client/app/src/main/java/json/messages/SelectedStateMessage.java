@@ -1,41 +1,45 @@
 package json.messages;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.util.Arrays;
+
 import json.enums.MessageTypes;
 import state.PossibleStatePoint;
 
 /**
  * Represents a message for setting new selected state
  * 
- * @author nikolijo
+ * @author nikolijo, ales_omerzel
  *
  */
 public class SelectedStateMessage extends BaseMessage{
 	
-	public PossibleStatePoint selectedState;
-	
-	public SelectedStateMessage() {
-		super();
-		this.type = MessageTypes.SELECTED_STATE_MSG;
-	}
-	
-	public SelectedStateMessage(String srcIP, String dstIP, String srcID, String dstID) {
-		super(srcIP, dstIP, srcID, dstID);
-		this.type = MessageTypes.SELECTED_STATE_MSG;
-	}
+	public String message;
 	
 	public SelectedStateMessage(String srcIP, String dstIP, String srcID, String dstID,
 			PossibleStatePoint selectedState) {
 		super(srcIP, dstIP, srcID, dstID);
-		this.type = MessageTypes.SELECTED_STATE_MSG;
-		this.selectedState = selectedState;
-	}
-	
-	public String toString() {
-		StringBuilder sb = new StringBuilder("[\n");
-		sb.append(super.toString());		
-		sb.append("\tselected state = " + selectedState + "\n");
-		sb.append("]");
-		return sb.toString();
-	}
 
+		JSONObject obj = new JSONObject();
+
+
+
+		obj.put("type", MessageTypes.POSSIBLE_STATES_MSG);
+		obj.put("srcIP", srcIP);
+		obj.put("dstIP", dstIP);
+		obj.put("srcID", srcID);
+		obj.put("dstID", dstID);
+
+		JSONArray init = new JSONArray();
+		if (selectedState != null && selectedState.values != null)
+			for (double d : selectedState.values)
+				init.add(d);
+
+		obj.put("selectedState", init);
+
+
+		this.message = obj.toJSONString();
+	}
 }

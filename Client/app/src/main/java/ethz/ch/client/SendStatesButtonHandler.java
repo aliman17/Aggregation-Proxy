@@ -6,14 +6,9 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.List;
 
-import json.WriteJSON;
 import json.messages.PossibleStatesMessage;
 import json.messages.SelectedStateMessage;
 import state.State;
@@ -39,31 +34,26 @@ public class SendStatesButtonHandler extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... arg0) {
 
+        PossibleStatesMessage posStMsg = new PossibleStatesMessage(
+                state.getClientIP(), state.getServerIP(), state.getClientID(),
+                state.getServerID(), state.getPossibleStates(), state.getInitState());
+
+        // Send selected state
+        SelectedStateMessage selStMsg = new SelectedStateMessage(
+                state.getClientIP(), state.getServerIP(), state.getClientID(),
+                state.getServerID(), state.getSelectedState());
+
+        Log.d("MESSAGE", posStMsg.message);
+        Log.d("MESSAGE", selStMsg.message);
+
         Socket socket = null;
 
         try {
-
-            // Send possible states
-
-            PossibleStatesMessage posStMsg = new PossibleStatesMessage(
-                    state.getClientIP(), state.getServerIP(), state.getClientID(),
-                    state.getServerID(), state.getPossibleStates(), state.getInitState());
-            String psm = WriteJSON.serialize("possibleStates", posStMsg);
-            Log.d("SEND", "Possible States Serialized - "+psm);
-
-            // Send selected state
-            SelectedStateMessage selStMsg = new SelectedStateMessage(
-                    state.getClientIP(), state.getServerIP(), state.getClientID(),
-                    state.getServerID(), state.getSelectedState());
-            String ssm = WriteJSON.serialize("selectedState", selStMsg);
-            Log.d("SEND", "Selected State Serialized - "+ssm);
-
             // Create new socket
             socket = new Socket(dstAddress, dstPort);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println(psm);
-            out.println(ssm);
-
+            out.println(posStMsg.message);
+            out.println(selStMsg.message);
             response = "Sent";
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block

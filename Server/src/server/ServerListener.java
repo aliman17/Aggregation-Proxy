@@ -9,7 +9,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import json.ReadJSON;
+import json.enums.MessageTypes;
 import json.messages.BaseMessage;
+import json.messages.PossibleStatesMessage;
 
 class ServerListener implements Runnable {
 
@@ -68,8 +70,8 @@ class ServerListener implements Runnable {
 				while(true){
 					msg = in.readLine();
 					if(msg == null) break;
-					BaseMessage bmsg = ReadJSON.deserialize(msg);
-					System.out.println(bmsg.toString());
+					//BaseMessage bmsg = ReadJSON.deserialize(msg);
+					System.out.println(msg);					
 				}
 				in.close();
 					
