@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="server_url" android:value="213.144.144.248"/>
+        <meta-data android:name="server_url" android:value="10.3.25.221"/>
         <meta-data android:name="server_port" android:value="8080"/>
 
     </application>

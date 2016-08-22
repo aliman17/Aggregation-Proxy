@@ -2,25 +2,27 @@ package json;
 
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import json.enums.MessageTypes;
 import json.messages.BaseMessage;
 import json.messages.PossibleStatesMessage;
 
 public class JsonParser {
+	public static JSONParser parser = new JSONParser();
+	
+	public static BaseMessage parse(String jsonMessage) throws ParseException{
+		
+		JSONObject obj = (JSONObject)parser.parse(jsonMessage);
+		String type = (String) obj.get("type");
+		String srcIP = (String) obj.get("srcIP");
+		String dstIP = (String) obj.get("dstIP");
+		String srcID = (String) obj.get("srcID");
+		String dstID = (String) obj.get("dstID");
 
-	public BaseMessage parse(String jsonMessage) throws JSONException{
-		
-		JSONObject obj = new JSONObject( jsonMessage );
-		String type = obj.getString("type");
-		String srcIP = obj.getString("srcIP");
-		String dstIP = obj.getString("dstIP");
-		String srcID = obj.getString("srcID");
-		String dstID = obj.getString("dstID");
-		
 		switch(type){
 		case "POSSIBLE_STATES_MSG":
 			ArrayList possibleStates = getPossibleStates(obj);
@@ -36,17 +38,17 @@ public class JsonParser {
 	}
 	
 	
-	private ArrayList getPossibleStates(JSONObject obj) throws JSONException{
+	private static ArrayList getPossibleStates(JSONObject obj) {
 		
 		ArrayList possibleStates = new ArrayList();
 		
-		JSONArray arr = obj.getJSONArray("possibleStates");
-		for (int i = 0; i < arr.length(); i++)
+		JSONArray arr = (JSONArray)obj.get("possibleStates");
+		for (int i = 0; i < arr.size(); i++)
 		{
-		    JSONArray coordinates = arr.getJSONArray(i);
-		    double[] coordinatesDouble = new double[coordinates.length()];
-		    for (int j = 0; j < coordinates.length(); j++) {
-		    	coordinatesDouble[j] = coordinates.getDouble(j);
+		    JSONArray coordinates = (JSONArray)arr.get(i);
+		    double[] coordinatesDouble = new double[coordinates.size()];
+		    for (int j = 0; j < coordinates.size(); j++) {
+		    	coordinatesDouble[j] = (double)coordinates.get(j);
 		    }
 		    possibleStates.add(coordinatesDouble);
 		}
@@ -55,13 +57,13 @@ public class JsonParser {
 		
 	}
 	
-	private double[] getInitState(JSONObject obj) throws JSONException{
+	private static double[] getInitState(JSONObject obj) {
 		
-		JSONArray coordinates = obj.getJSONArray("initState");
-		double[] coordinatesDouble = new double[coordinates.length()];
+		JSONArray coordinates = (JSONArray)obj.get("initState");
+		double[] coordinatesDouble = new double[coordinates.size()];
 		
-		for (int i = 0; i < coordinates.length(); i++)
-		    coordinatesDouble[i] = coordinates.getDouble(i);
+		for (int i = 0; i < coordinates.size(); i++)
+		    coordinatesDouble[i] = (double)coordinates.get(i);
 		
 		return coordinatesDouble;
 	}
