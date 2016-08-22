@@ -1,6 +1,7 @@
 package data;
 
 import android.content.Context;
+import android.os.RemoteException;
 import android.util.Log;
 
 
@@ -124,24 +125,23 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
 
 
-    public SensorPoint getLatestLightValue(){
-        LightReading lReading;
+    public SensorPoint getLatestLightValue() throws RemoteException {
+        SensorReading reading = nervousnetServiceController.getLatestReading(LibConstants.SENSOR_LIGHT);
 
-        try{
-            lReading  = (LightReading)nervousnetServiceController.getLatestReading(LibConstants.SENSOR_LIGHT);
+        if (reading instanceof LightReading){
+            LightReading lReading = (LightReading) reading;
             long timestamp = lReading.timestamp;
             double[] values = {lReading.getLuxValue()};
             int type = lReading.type;
             Log.d("NERVOUSNET", "Getting light value ... " + values[0]);
             return new SensorPoint(type, timestamp, values);
-        } catch (Exception e){
-            e.printStackTrace();
+        } else {
+            throw new RemoteException();
         }
-        return null;
     }
 
     @Override
-    public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime) {
+    public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime) throws RemoteException {
         // TODO: get real data
         ArrayList<SensorPoint> values = new ArrayList<>();
         for(int i = 0; i < 50; i++)

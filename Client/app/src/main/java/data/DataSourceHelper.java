@@ -1,5 +1,7 @@
 package data;
 
+import android.os.RemoteException;
+
 import java.util.ArrayList;
 
 import clustering.Point;
@@ -15,7 +17,7 @@ public class DataSourceHelper {
     private static boolean bBattery = false;
     private static boolean bNoise = true;
 
-    public static Point getNextDataPoint(iDataSource dataSource) {
+    public static Point getNextDataPoint(iDataSource dataSource) throws RemoteException {
         ArrayList<SensorPoint> listOfSensors = new ArrayList<>();
 
         // The ORDER is important. Only first two dimensions will be plotted.
@@ -46,8 +48,13 @@ public class DataSourceHelper {
         ArrayList<Point> points = new ArrayList<>();
 
         for( int i = 0; i < 50; i++) {
-            Point newPoint = getNextDataPoint(dataSource);
-            points.add(newPoint);
+            Point newPoint = null;
+            try {
+                newPoint = getNextDataPoint(dataSource);
+                points.add(newPoint);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
         return points;
     }
