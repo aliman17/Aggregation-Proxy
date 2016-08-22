@@ -12,7 +12,7 @@ import sensor.SensorPoint;
 public class DataSourceHelper {
 
     private static boolean bLight = true;
-    private static boolean bBattery = true;
+    private static boolean bBattery = false;
     private static boolean bNoise = true;
 
     public static Point getNextDataPoint(iDataSource dataSource) {
