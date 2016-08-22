@@ -6,6 +6,8 @@ import android.util.Log;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
 import ch.ethz.coss.nervousnet.lib.BatteryReading;
@@ -17,6 +19,7 @@ import ch.ethz.coss.nervousnet.lib.NervousnetSensorDataListener;
 import ch.ethz.coss.nervousnet.lib.NervousnetServiceConnectionListener;
 import ch.ethz.coss.nervousnet.lib.NervousnetServiceController;
 import ch.ethz.coss.nervousnet.lib.NoiseReading;
+import ch.ethz.coss.nervousnet.lib.RemoteCallback;
 import ch.ethz.coss.nervousnet.lib.SensorReading;
 import sensor.SensorPoint;
 
@@ -145,7 +148,17 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
         // TODO: get real data
         ArrayList<SensorPoint> values = new ArrayList<>();
         for(int i = 0; i < 50; i++)
-            values.add(getLatestLightValue());
+            values.add(getLatestBatteryValue());
+
+        Callback cb = new Callback();
+        ArrayList<SensorReading> readings = new ArrayList<>();
+        cb.success(readings);
+        nervousnetServiceController.getReadings(LibConstants.SENSOR_LIGHT,
+                startTime,
+                stopTime,
+                cb);
+
+        Log.d("READINGS", ""+readings.size());
         return values;
     }
 
@@ -193,6 +206,41 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     //@Override
     public void onServiceConnectionFailed() {
 
+    }
+
+
+    class Callback extends RemoteCallback.Stub {
+
+        @Override
+        public void success(final List<SensorReading> list) throws RemoteException {
+
+
+                    Log.d("LightmeterActivity", "callback success "+list.size());
+//                                successImpl(result);
+
+
+                        Iterator<SensorReading> iterator;
+                        iterator = list.iterator();
+                        while (iterator.hasNext()) {
+                            SensorReading reading = iterator.next();
+
+                            Log.d("LightmeterActivity", "Light Reading found - " + ((LightReading) reading).getLuxValue());
+                        }
+
+
+        }
+
+        @Override
+        public void failure(final ErrorReading reading) throws RemoteException {
+
+                    Log.d("LightmeterActivity", "callback failure "+reading.getErrorString());
+
+        }
+//
+//        @Override
+//        public IBinder asBinder() {
+//            return super.asBinder();
+//        }
     }
 
 }

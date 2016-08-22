@@ -47,6 +47,10 @@ public class PeriodicExecution extends Thread {
         Log.d("PERIODICITY", "Start periodic execution ...");
         this.isRunning = true;
 
+        points.clear();
+        points.addAll( DataSourceHelper.getInitData( dataSource ) );
+        clustering.compute(points);
+
         ArrayList<Point> newPoints = new ArrayList<>();
 
         long currentTimestamp;

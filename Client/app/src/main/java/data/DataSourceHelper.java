@@ -56,6 +56,13 @@ public class DataSourceHelper {
                 e.printStackTrace();
             }
         }
+        try {
+            dataSource.getLightValues( System.currentTimeMillis() - 1000000, System.currentTimeMillis());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+
         return points;
     }
 }
