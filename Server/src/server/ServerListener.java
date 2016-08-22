@@ -8,7 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import json.ReadJSON;
 import json.enums.MessageTypes;
 import json.messages.BaseMessage;
 import json.messages.PossibleStatesMessage;
