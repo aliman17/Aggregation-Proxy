@@ -1,5 +1,6 @@
 package periodic;
 
+import android.os.RemoteException;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ public class PeriodicExecution extends Thread {
         Log.d("PERIODICITY", "Start periodic execution ...");
         this.isRunning = true;
 
+        points.clear();
+        points.addAll( DataSourceHelper.getInitData( dataSource ) );
+        clustering.compute(points);
+
         ArrayList<Point> newPoints = new ArrayList<>();
 
         long currentTimestamp;
@@ -59,7 +64,13 @@ public class PeriodicExecution extends Thread {
             }
 
             // get latest data
-            Point newPoint = DataSourceHelper.getNextDataPoint( dataSource );
+            Point newPoint = null;
+            try {
+                newPoint = DataSourceHelper.getNextDataPoint( dataSource );
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                continue;
+            }
             newPoints.add(newPoint);
             int clusterNum = clustering.classify(newPoint);
             Log.d("NEW_THREAD", "Goes to cluster " + clusterNum + " running:"+isRunning);

@@ -56,17 +56,21 @@ public class Client extends Activity {
         buttonNervousnet.setOnClickListener(buttonNervousnetOnClickListener);
 
         // Get sensors data
+        Log.d("Activity", "Init nervousnet ...");
         Nervousnet nervousnet = new Nervousnet(this);
         nervousnet.connect();
         dataSource = nervousnet;
 
         // Clustering
+        Log.d("Activity", "Init clustering ...");
         clustering = new KMeans(numOfDimensions, numOfClusters);
 
         // Initialize state of the client
+        Log.d("Activity", "Init state ...");
         state = new State(this);
 
         // Plot
+        Log.d("Activity", "Init plot ...");
         GraphView graph_view = (GraphView) findViewById(R.id.graph);
         graph = new GraphPlot(graph_view);
 

@@ -38,9 +38,6 @@ public class PeriodicExecutionHandler implements iPeriodicExecutionHandler {
         // If periodic execution doesn't exist, create one
         if (periodicExecution == null){
             Log.d("BUTTON", "Nervousnet button pressed and is under execution ...");
-            points.clear();
-            points.addAll( DataSourceHelper.getInitData( dataSource ) );
-            clustering.compute(points);
             periodicExecution = new PeriodicExecution(state, points, clustering, dataSource);
             periodicExecution.start();
         }

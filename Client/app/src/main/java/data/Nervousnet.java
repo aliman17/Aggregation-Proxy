@@ -6,6 +6,7 @@ import android.util.Log;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
@@ -35,6 +36,9 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     // Connection to the service
     NervousnetServiceController nervousnetServiceController;
 
+    // Reading
+    SensorReading lReading;
+
     // Constructor
     public Nervousnet(Context context){
         this.context = context;
@@ -42,8 +46,14 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
     // Connect
     public void connect(){
+        Log.d("NERVOUSNET", "Connecting ...");
         nervousnetServiceController = new NervousnetServiceController(this.context, this);
-        nervousnetServiceController.connect();
+        Log.d("NERVOUSNET", "Connecting2 ..." + nervousnetServiceController);
+        try {
+            nervousnetServiceController.connect();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public SensorPoint getLatestAccValue(){
@@ -64,43 +74,7 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     @Override
     public ArrayList<SensorPoint> getAccValues(long startTime, long stopTime) {
 
-        final RemoteCallback.Stub cbBinder = new RemoteCallback.Stub() {
 
-            @Override
-            public void success(List list) throws RemoteException {
-                SensorReading lReading = null;
-                Log.d("LightmeterActivity", "GREAT1!!!");
-                if(list.size() > 0)
-                    lReading = (SensorReading) list.get(0);
-                if(lReading != null) {
-                    if(lReading instanceof LightReading)
-                        Log.d("LightmeterActivity", "GREAT!!!");
-                    if(lReading instanceof AccelerometerReading)
-                        Log.d("LightmeterActivity", "GREAT!!!");
-
-                }else {
-                    Log.d("LightmeterActivity", "BAD");
-                }
-
-            }
-
-            @Override
-
-            public void failure(ErrorReading reading) throws RemoteException {
-                Log.d("LightmeterActivity", "FAILURE");
-            }
-
-        };
-
-        try {
-            nervousnetServiceController.mService.getReadings(
-                    LibConstants.SENSOR_ACCELEROMETER,
-                    startTime,
-                    stopTime,
-                    cbBinder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return null;
     }
 
@@ -154,28 +128,37 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
 
 
-    public SensorPoint getLatestLightValue(){
-        LightReading lReading;
+    public SensorPoint getLatestLightValue() throws RemoteException {
+        SensorReading reading = nervousnetServiceController.getLatestReading(LibConstants.SENSOR_LIGHT);
 
-        try{
-            lReading  = (LightReading)nervousnetServiceController.getLatestReading(LibConstants.SENSOR_LIGHT);
+        if (reading instanceof LightReading){
+            LightReading lReading = (LightReading) reading;
             long timestamp = lReading.timestamp;
             double[] values = {lReading.getLuxValue()};
             int type = lReading.type;
             Log.d("NERVOUSNET", "Getting light value ... " + values[0]);
             return new SensorPoint(type, timestamp, values);
-        } catch (Exception e){
-            e.printStackTrace();
+        } else {
+            throw new RemoteException();
         }
-        return null;
     }
 
     @Override
-    public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime) {
+    public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime) throws RemoteException {
         // TODO: get real data
         ArrayList<SensorPoint> values = new ArrayList<>();
         for(int i = 0; i < 50; i++)
-            values.add(getLatestLightValue());
+            values.add(getLatestBatteryValue());
+
+        Callback cb = new Callback();
+        ArrayList<SensorReading> readings = new ArrayList<>();
+        cb.success(readings);
+        nervousnetServiceController.getReadings(LibConstants.SENSOR_LIGHT,
+                startTime,
+                stopTime,
+                cb);
+
+        Log.d("READINGS", ""+readings.size());
         return values;
     }
 
@@ -202,7 +185,7 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
     @Override
     public void onSensorDataReady(SensorReading reading) {
-
+        this.lReading = reading;
     }
 
     @Override
@@ -216,8 +199,48 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     }
 
     @Override
+    public void onServiceConnectionFailed(ErrorReading errorReading) {
+
+    }
+
+    //@Override
     public void onServiceConnectionFailed() {
 
+    }
+
+
+    class Callback extends RemoteCallback.Stub {
+
+        @Override
+        public void success(final List<SensorReading> list) throws RemoteException {
+
+
+                    Log.d("LightmeterActivity", "callback success "+list.size());
+//                                successImpl(result);
+
+
+                        Iterator<SensorReading> iterator;
+                        iterator = list.iterator();
+                        while (iterator.hasNext()) {
+                            SensorReading reading = iterator.next();
+
+                            Log.d("LightmeterActivity", "Light Reading found - " + ((LightReading) reading).getLuxValue());
+                        }
+
+
+        }
+
+        @Override
+        public void failure(final ErrorReading reading) throws RemoteException {
+
+                    Log.d("LightmeterActivity", "callback failure "+reading.getErrorString());
+
+        }
+//
+//        @Override
+//        public IBinder asBinder() {
+//            return super.asBinder();
+//        }
     }
 
 }
