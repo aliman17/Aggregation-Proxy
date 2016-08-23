@@ -13,11 +13,11 @@ public interface iDataSource {
     public SensorPoint getLatestLightValue() throws RemoteException;
     public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime) throws RemoteException;
 
-    public SensorPoint getLatestAccValue();
-    public ArrayList<SensorPoint> getAccValues(long startTime, long stopTime);
+    public SensorPoint getLatestAccValue() throws RemoteException;
+    public ArrayList<SensorPoint> getAccValues(long startTime, long stopTime) throws RemoteException;
 
-    public SensorPoint getLatestBatteryValue();
-    public ArrayList<SensorPoint> getBatteryValues(long startTime, long stopTime);
+    public SensorPoint getLatestBatteryValue() throws RemoteException;
+    public ArrayList<SensorPoint> getBatteryValues(long startTime, long stopTime) throws RemoteException;
 
-    public SensorPoint getLatestNoiseValue();
+    public SensorPoint getLatestNoiseValue() throws RemoteException;
 }
