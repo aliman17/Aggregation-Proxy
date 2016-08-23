@@ -120,7 +120,13 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
         return values;
     }
 
-
+    @Override
+    public ArrayList<SensorPoint> getNoiseValues(long startTime, long stopTime) throws RemoteException {
+        ArrayList<SensorPoint> values = new ArrayList<>();
+        Callback cb = new Callback(SensorType.NOISE, values);
+        nervousnetServiceController.getReadings(LibConstants.SENSOR_NOISE, startTime, stopTime, cb);
+        return values;
+    }
 
     /////////////////////////////////////////////////////////////////////////
     // GENERATORS OF SENSOR POINT

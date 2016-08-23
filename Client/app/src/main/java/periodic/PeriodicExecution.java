@@ -48,7 +48,13 @@ public class PeriodicExecution extends Thread {
         this.isRunning = true;
 
         points.clear();
-        points.addAll( DataSourceHelper.getInitData( dataSource ) );
+        try {
+            points.addAll( DataSourceHelper.getInitData( dataSource ) );
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            // TODO: Instead of terminting here, we can probably still proceed
+            return;
+        }
         clustering.compute(points);
 
         ArrayList<Point> newPoints = new ArrayList<>();

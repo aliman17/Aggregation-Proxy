@@ -1,7 +1,11 @@
 package data;
 
 import android.os.RemoteException;
+import android.util.Log;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import clustering.Point;
@@ -16,6 +20,8 @@ public class DataSourceHelper {
     private static boolean bLight = true;
     private static boolean bBattery = false;
     private static boolean bNoise = true;
+
+    private static final long oneDayMiliseconds = 86400000;
 
     public static Point getNextDataPoint(iDataSource dataSource) throws RemoteException {
         ArrayList<SensorPoint> listOfSensors = new ArrayList<>();
@@ -43,7 +49,7 @@ public class DataSourceHelper {
         return new Point(ms.getValues(), ms);
     }
 
-    public static ArrayList<Point> getInitData(iDataSource dataSource) {
+    public static ArrayList<Point> getInitData(iDataSource dataSource) throws RemoteException {
 
         ArrayList<Point> points = new ArrayList<>();
 
@@ -56,11 +62,42 @@ public class DataSourceHelper {
                 e.printStackTrace();
             }
         }
-        try {
-            dataSource.getLightValues( System.currentTimeMillis() - 1000000, System.currentTimeMillis());
-        } catch (RemoteException e) {
-            e.printStackTrace();
+
+        ArrayList<ArrayList> listOfSensorsArrays = new ArrayList<>();
+
+
+        long stop = System.currentTimeMillis();
+        long start = stop - oneDayMiliseconds;
+
+        if (bLight) {
+            ArrayList<SensorPoint> arr = dataSource.getLightValues( start, stop );
+            listOfSensorsArrays.add( arr );
+
+            for (SensorPoint point : arr) {
+                Log.d("TIMESTAMP-LIGHT", "" + point.getTimestamp());
+            }
+
         }
+
+        if (bNoise) {
+            ArrayList<SensorPoint> arr = dataSource.getNoiseValues( start, stop );
+            listOfSensorsArrays.add( arr );
+
+            for (SensorPoint point : arr) {
+                Log.d("TIMESTAMP-NOISE", "" + point.getTimestamp());
+            }
+        }
+
+        if (bBattery) {
+            ArrayList<SensorPoint> arr = dataSource.getBatteryValues( start, stop );
+            listOfSensorsArrays.add( arr );
+
+            for (SensorPoint point : arr) {
+                Log.d("TIMESTAMP-BATTERY", "" + point.getTimestamp());
+            }
+        }
+
+
 
 
         return points;

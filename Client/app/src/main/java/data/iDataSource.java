@@ -20,4 +20,5 @@ public interface iDataSource {
     public ArrayList<SensorPoint> getBatteryValues(long startTime, long stopTime) throws RemoteException;
 
     public SensorPoint getLatestNoiseValue() throws RemoteException;
+    public ArrayList<SensorPoint> getNoiseValues(long startTime, long stopTime) throws RemoteException;
 }
