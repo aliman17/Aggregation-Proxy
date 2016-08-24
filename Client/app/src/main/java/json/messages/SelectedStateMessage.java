@@ -25,8 +25,8 @@ public class SelectedStateMessage extends BaseMessage{
 		JSONObject obj = new JSONObject();
 
 
-
-		obj.put("type", MessageTypes.POSSIBLE_STATES_MSG);
+//TODO: SELECTED STATE MUST NOT BE STATIC
+		obj.put("type", "SELECTED_STATE_MESSAGE");
 		obj.put("srcIP", srcIP);
 		obj.put("dstIP", dstIP);
 		obj.put("srcID", srcID);

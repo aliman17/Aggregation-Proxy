@@ -26,8 +26,8 @@ public class PossibleStatesMessage extends BaseMessage {
 		JSONObject obj = new JSONObject();
 
 
-
-		obj.put("type", MessageTypes.POSSIBLE_STATES_MSG);
+// TODO, possible state message
+		obj.put("type", "POSSIBLE_STATES_MSG");
 		obj.put("srcIP", srcIP);
 		obj.put("dstIP", dstIP);
 		obj.put("srcID", srcID);

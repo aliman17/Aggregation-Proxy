@@ -1,5 +1,8 @@
 package json.messages;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import json.enums.MessageTypes;
 
 /**
@@ -11,42 +14,27 @@ import json.enums.MessageTypes;
  */
 public class PossibleStatesMessage extends BaseMessage {
 	
-	public double[] possibleStates;
-	public double initState;
-	
-	public PossibleStatesMessage() {
-		super();
-	}
-	
-	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID) {
-		super(srcIP, dstIP, srcID, dstID);
-		this.type = MessageTypes.POSSIBLE_STATES_MSG;
-	}
+	public ArrayList possibleStates;
+	public double[] initState;
 	
 	public PossibleStatesMessage(String srcIP, String dstIP, String srcID, String dstID,
-			double[] possibleStates, double initState) {
+			ArrayList possibleStates, double[] initState) {
 		super(srcIP, dstIP, srcID, dstID);
 		this.type = MessageTypes.POSSIBLE_STATES_MSG;
 		this.possibleStates = possibleStates;
 		this.initState = initState;
 	}
 	
-	public String toString() {
-		StringBuilder sb = new StringBuilder("[\n");
-		sb.append(super.toString());
-		sb.append("\tpossible states = [ ");
-		if(possibleStates != null) {
-			for(int i = 0; i < possibleStates.length; i++) {
-				sb.append(possibleStates[i]);
-				if(i < possibleStates.length - 1) {
-					sb.append(", ");
-				}
-			}
-		}		
-		sb.append(" ]\n");		
-		sb.append("\tinit state = " + initState + "\n");
-		sb.append("]");
-		return sb.toString();
+	public String toString(){
+		String str = this.srcIP + " " + this.srcID + " " + this.dstIP + " " + this.dstID + " ";
+		str += "possibleStates:[";
+		for(int i = 0; i < this.possibleStates.size(); i++){
+			str += Arrays.toString((double[]) this.possibleStates.get(i));
+			str += " ";
+		}
+		str += "] ";
+		str += "initStates:" + Arrays.toString(this.initState);
+		return str;
 	}
-
+	
 }
