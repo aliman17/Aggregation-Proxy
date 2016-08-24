@@ -15,13 +15,19 @@ batteryFile = open('./timestamps/batteryTimestamps-'+str(version)+'.txt', 'w')
 for line in context:
 	if "TIMESTAMP-LIGHT" in line:
 		split = line.split()
-		lightFile.write(split[-1] + '\n')
+		arr = split[-1]
+		val = arr[1:(len(arr)-1)]
+		lightFile.write(split[-2] + ' ' + val + '\n')
 	elif "TIMESTAMP-NOISE" in line:
 		split = line.split()
-		noiseFile.write(split[-1] + '\n')
+		arr = split[-1]
+		val = arr[1:(len(arr)-1)]
+		noiseFile.write(split[-2] + ' ' + val + '\n')
 	elif "TIMESTAMP-BATTERY" in line:
 		split = line.split()
-		batteryFile.write(split[-1] + '\n')
+		arr = split[-1]
+		val = arr[1:(len(arr)-1)]
+		batteryFile.write(split[-2] + ' ' + val + '\n')
 
 versionFile = open('version', 'w')
 versionFile.write(str(version))

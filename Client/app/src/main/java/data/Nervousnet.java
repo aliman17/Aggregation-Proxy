@@ -65,7 +65,7 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
 
     /////////////////////////////////////////////////////////////////////////
-    // GET LATEST DATA
+    // LATEST DATA
     /////////////////////////////////////////////////////////////////////////
 
     public SensorPoint getLatestAccValue() throws RemoteException {
@@ -93,7 +93,7 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
 
     /////////////////////////////////////////////////////////////////////////
-    // GET DATA FROM THE GIVEN RANGE
+    // RANGE
     /////////////////////////////////////////////////////////////////////////
 
     @Override
@@ -108,7 +108,9 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     public ArrayList<SensorPoint> getBatteryValues(long startTime, long stopTime) throws RemoteException {
         ArrayList<SensorPoint> values = new ArrayList<>();
         Callback cb = new Callback(SensorType.BATTERY, values);
+        Log.d("NERVOUSNET-BATTERY", "battery getReadings start ...");
         nervousnetServiceController.getReadings(LibConstants.SENSOR_BATTERY, startTime, stopTime, cb);
+        Log.d("NERVOUSNET-BATTERY", "battery getReadings stop ...");
         return values;
     }
 
@@ -116,7 +118,9 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     public ArrayList<SensorPoint> getLightValues(long startTime, long stopTime) throws RemoteException {
         ArrayList<SensorPoint> values = new ArrayList<>();
         Callback cb = new Callback(SensorType.LIGHT, values);
+        Log.d("NERVOUSNET-LIGHT", "light getReadings start ...");
         nervousnetServiceController.getReadings(LibConstants.SENSOR_LIGHT, startTime, stopTime, cb);
+        Log.d("NERVOUSNET-LIGHT", "light getReadings stop ...");
         return values;
     }
 
@@ -124,12 +128,76 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     public ArrayList<SensorPoint> getNoiseValues(long startTime, long stopTime) throws RemoteException {
         ArrayList<SensorPoint> values = new ArrayList<>();
         Callback cb = new Callback(SensorType.NOISE, values);
+        Log.d("NERVOUSNET-NOISE", "noise getReadings start ...");
         nervousnetServiceController.getReadings(LibConstants.SENSOR_NOISE, startTime, stopTime, cb);
+        Log.d("NERVOUSNET-NOISE", "noise getReadings stop ...");
         return values;
     }
 
+
     /////////////////////////////////////////////////////////////////////////
-    // GENERATORS OF SENSOR POINT
+    // CALLBACK
+    /////////////////////////////////////////////////////////////////////////
+
+    class Callback extends RemoteCallback.Stub {
+        private SensorType sType;
+        private List listToFill;
+
+        public Callback(SensorType sType, List listToFill){
+            this.sType = sType;
+            this.listToFill = listToFill;
+        }
+
+        @Override
+        public void success(final List<SensorReading> list) throws RemoteException {
+
+            Log.d("NERVOUSNET CALLBACK", sType + " callback success " + list.size());
+
+            Iterator<SensorReading> iterator;
+            iterator = list.iterator();
+
+            while (iterator.hasNext()) {
+                SensorReading sReading = iterator.next();
+                SensorPoint sensorpoint = null;
+                switch (sType) {
+                    case ACC:
+                        // TODO
+                        break;
+                    case BATTERY:
+                        BatteryReading bReading = (BatteryReading) sReading;
+                        sensorpoint = generateSensorPointBattery(bReading);
+                        break;
+                    case GYRO:
+                        // TODO
+                        break;
+                    case LIGHT:
+                        LightReading lReading = (LightReading) sReading;
+                        sensorpoint = generateSensorPointLight(lReading);
+                        break;
+                    case LOC:
+                        // TODO
+                        break;
+                    case NOISE:
+                        NoiseReading nReading = (NoiseReading) sReading;
+                        sensorpoint = generateSensorPointNoise(nReading);
+                        break;
+                }
+                listToFill.add(sensorpoint);
+            }
+        }
+
+        @Override
+        public void failure(final ErrorReading reading) throws RemoteException {
+            Log.d("NERVOUSNET CALLBACK", sType + "callback failure "+reading.getErrorString());
+        }
+
+    }
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////
+    // GENERATORS
     /////////////////////////////////////////////////////////////////////////
 
     public SensorPoint generateSensorPointAcc(AccelerometerReading reading) {
@@ -199,72 +267,6 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     public void onServiceConnectionFailed(ErrorReading errorReading) {
 
     }
-
-    //@Override
-    public void onServiceConnectionFailed() {
-
-    }
-
-
-    /////////////////////////////////////////////////////////////////////////
-    // CALLBACK
-    /////////////////////////////////////////////////////////////////////////
-
-    class Callback extends RemoteCallback.Stub {
-        private SensorType sType;
-        private List listToFill;
-
-        public Callback(SensorType sType, List listToFill){
-            this.sType = sType;
-            this.listToFill = listToFill;
-        }
-
-        @Override
-        public void success(final List<SensorReading> list) throws RemoteException {
-
-            Log.d("NERVOUSNET CALLBACK", sType + " callback success " + list.size());
-
-            Iterator<SensorReading> iterator;
-            iterator = list.iterator();
-
-            while (iterator.hasNext()) {
-                SensorReading sReading = iterator.next();
-                SensorPoint sensorpoint = null;
-                switch (sType) {
-                    case ACC:
-                        // TODO
-                        break;
-                    case BATTERY:
-                        BatteryReading bReading = (BatteryReading) sReading;
-                        sensorpoint = generateSensorPointBattery(bReading);
-                        break;
-                    case GYRO:
-                        // TODO
-                        break;
-                    case LIGHT:
-                        LightReading lReading = (LightReading) sReading;
-                        sensorpoint = generateSensorPointLight(lReading);
-                        break;
-                    case LOC:
-                        // TODO
-                        break;
-                    case NOISE:
-                        NoiseReading nReading = (NoiseReading) sReading;
-                        sensorpoint = generateSensorPointNoise(nReading);
-                        break;
-                }
-                Log.d("NERVOUSNET CALLBACK", "sensor type:" + sensorpoint.getSensorType() + " coordinates:" + Arrays.toString(sensorpoint.getValues()));
-                listToFill.add(sensorpoint);
-            }
-        }
-
-        @Override
-        public void failure(final ErrorReading reading) throws RemoteException {
-            Log.d("NERVOUSNET CALLBACK", "callback failure "+reading.getErrorString());
-        }
-
-    }
-
 
 
 

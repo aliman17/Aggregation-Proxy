@@ -1,5 +1,6 @@
 package ethz.ch.client;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -38,6 +39,9 @@ public class Client extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Don't allow rotation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
         // Create front-end view
         setContentView(R.layout.activity_client);

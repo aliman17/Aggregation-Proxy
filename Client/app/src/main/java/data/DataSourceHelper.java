@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import clustering.Point;
 import sensor.MultiSensorPoint;
@@ -18,7 +19,7 @@ import sensor.SensorPoint;
 public class DataSourceHelper {
 
     private static boolean bLight = true;
-    private static boolean bBattery = false;
+    private static boolean bBattery = true;
     private static boolean bNoise = true;
 
     private static final long oneDayMiliseconds = 86400000;
@@ -74,7 +75,7 @@ public class DataSourceHelper {
             listOfSensorsArrays.add( arr );
 
             for (SensorPoint point : arr) {
-                Log.d("TIMESTAMP-LIGHT", "" + point.getTimestamp());
+                Log.d("TIMESTAMP-LIGHT", "" + point.getTimestamp() + " " + Arrays.toString(point.getValues()));
             }
 
         }
@@ -82,18 +83,18 @@ public class DataSourceHelper {
         if (bNoise) {
             ArrayList<SensorPoint> arr = dataSource.getNoiseValues( start, stop );
             listOfSensorsArrays.add( arr );
-
+            //Log.d("TIMESTAMP-NOISE", "Size: " + arr.size());
             for (SensorPoint point : arr) {
-                Log.d("TIMESTAMP-NOISE", "" + point.getTimestamp());
+                Log.d("TIMESTAMP-NOISE", "" + point.getTimestamp()+ " " + Arrays.toString(point.getValues()));
             }
         }
 
         if (bBattery) {
             ArrayList<SensorPoint> arr = dataSource.getBatteryValues( start, stop );
             listOfSensorsArrays.add( arr );
-
+            //Log.d("TIMESTAMP-BATTERY", "Size: " + arr.size());
             for (SensorPoint point : arr) {
-                Log.d("TIMESTAMP-BATTERY", "" + point.getTimestamp());
+                Log.d("TIMESTAMP-BATTERY", "" + point.getTimestamp()+ " " + Arrays.toString(point.getValues()));
             }
         }
 
