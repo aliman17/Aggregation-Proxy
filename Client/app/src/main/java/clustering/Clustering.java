@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Interface specifies the exact structure of any clustering algorithm.
  */
 public interface Clustering {
-    public ArrayList<Cluster> compute(ArrayList<Point> points);
+    public ArrayList<Cluster> compute(ArrayList<? extends Point> points);
     public int[] classify(ArrayList<Point> points);
     public int classify(Point point);
     public ArrayList<Cluster> getClusters();

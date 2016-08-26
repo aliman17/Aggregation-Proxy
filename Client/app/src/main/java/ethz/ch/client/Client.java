@@ -28,7 +28,7 @@ public class Client extends Activity {
     Clustering clustering;
     GraphPlot graph;
     int numOfClusters = 3;
-    int numOfDimensions = 2;
+    int numOfDimensions = 10;
     TextView sendResponse, textNervousnet;
     Button buttonConnect, buttonNervousnet;
     OnClickListener buttonConnectOnClickListener;

@@ -3,15 +3,22 @@ package data;
 import android.os.RemoteException;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
-import clustering.Point;
-import sensor.MultiSensorPoint;
-import sensor.SensorPoint;
+
+import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
+import ch.ethz.coss.nervousnet.lib.BatteryReading;
+import ch.ethz.coss.nervousnet.lib.GyroReading;
+import ch.ethz.coss.nervousnet.lib.LightReading;
+import ch.ethz.coss.nervousnet.lib.NoiseReading;
+import ch.ethz.coss.nervousnet.lib.ProximityReading;
+import ch.ethz.coss.nervousnet.lib.SensorReading;
+import sensor.VirtualSensorPoint;
 
 /**
  * Created by ales on 03/08/16.
@@ -19,88 +26,149 @@ import sensor.SensorPoint;
 public class DataSourceHelper {
 
     private static boolean bLight = true;
-    private static boolean bBattery = true;
-    private static boolean bNoise = true;
+    private static boolean bBattery = false;
+    private static boolean bNoise = false;
 
     private static final long oneDayMiliseconds = 86400000;
+    private static final long initWindowSizeMiliseconds = 10000;
 
-    public static Point getNextDataPoint(iDataSource dataSource) throws RemoteException {
-        ArrayList<SensorPoint> listOfSensors = new ArrayList<>();
+    public static VirtualSensorPoint getNextVirtualSensorPoint(iDataSource dataSource) throws RemoteException {
 
-        // The ORDER is important. Only first two dimensions will be plotted.
+        VirtualSensorPoint virtualPoint = new VirtualSensorPoint();
 
-        // Get data from all sensors you want and create multidimensional point
         if (bLight) {
-            SensorPoint lightValues = dataSource.getLatestLightValue();
-            listOfSensors.add(lightValues);
+            LightReading light = dataSource.getLatestLightValue();
+            virtualPoint.setLight( light.getLuxValue() );
         }
 
         if (bNoise) {
-            SensorPoint noiseValues = dataSource.getLatestNoiseValue();
-            listOfSensors.add(noiseValues);
+            NoiseReading noise = dataSource.getLatestNoiseValue();
+            virtualPoint.setNoise( noise.getdbValue() );
         }
 
         if (bBattery) {
-            SensorPoint batteryValues = dataSource.getLatestBatteryValue();
-            listOfSensors.add(batteryValues);
+            BatteryReading battery = dataSource.getLatestBatteryValue();
+            virtualPoint.setBattery( battery.getPercent() );
         }
 
-        MultiSensorPoint ms = new MultiSensorPoint(listOfSensors);
-
-        return new Point(ms.getValues(), ms);
+        return virtualPoint;
     }
 
-    public static ArrayList<Point> getInitData(iDataSource dataSource) throws RemoteException {
-
-        ArrayList<Point> points = new ArrayList<>();
-
-        for( int i = 0; i < 50; i++) {
-            Point newPoint = null;
-            try {
-                newPoint = getNextDataPoint(dataSource);
-                points.add(newPoint);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        ArrayList<ArrayList> listOfSensorsArrays = new ArrayList<>();
-
+    public static ArrayList<VirtualSensorPoint> getInitData(iDataSource dataSource) throws RemoteException {
 
         long stop = System.currentTimeMillis();
         long start = stop - oneDayMiliseconds;
 
+        ArrayList<ArrayList<SensorReading>> arr = new ArrayList<>();
+
         if (bLight) {
-            ArrayList<SensorPoint> arr = dataSource.getLightValues( start, stop );
-            listOfSensorsArrays.add( arr );
+            ArrayList<SensorReading> light = dataSource.getLightValues( start, stop );
+            if (light != null) {
+                arr.add(light);
 
-            for (SensorPoint point : arr) {
-                Log.d("TIMESTAMP-LIGHT", "" + point.getTimestamp() + " " + Arrays.toString(point.getValues()));
+                for (SensorReading point : light) {
+                    Log.d("TIMESTAMP-LIGHT", "" + point.timestamp + " " + ((LightReading) point).getLuxValue());
+                }
             }
+            else {
 
+            }
         }
 
         if (bNoise) {
-            ArrayList<SensorPoint> arr = dataSource.getNoiseValues( start, stop );
-            listOfSensorsArrays.add( arr );
-            //Log.d("TIMESTAMP-NOISE", "Size: " + arr.size());
-            for (SensorPoint point : arr) {
-                Log.d("TIMESTAMP-NOISE", "" + point.getTimestamp()+ " " + Arrays.toString(point.getValues()));
+            ArrayList<SensorReading> noise = dataSource.getNoiseValues( start, stop );
+            if (noise != null) {
+                arr.add(noise);
+                //Log.d("TIMESTAMP-NOISE", "Size: " + arr.size());
+                for (SensorReading point : noise) {
+                    Log.d("TIMESTAMP-NOISE", "" + point.timestamp + " " + ((NoiseReading) point).getdbValue());
+                }
+            }
+            else{
+
             }
         }
 
         if (bBattery) {
-            ArrayList<SensorPoint> arr = dataSource.getBatteryValues( start, stop );
-            listOfSensorsArrays.add( arr );
-            //Log.d("TIMESTAMP-BATTERY", "Size: " + arr.size());
-            for (SensorPoint point : arr) {
-                Log.d("TIMESTAMP-BATTERY", "" + point.getTimestamp()+ " " + Arrays.toString(point.getValues()));
+            ArrayList<SensorReading> battery = dataSource.getBatteryValues( start, stop );
+            if (battery != null) {
+                arr.add(battery);
+                //Log.d("TIMESTAMP-BATTERY", "Size: " + arr.size());
+                for (SensorReading point : battery) {
+                    Log.d("TIMESTAMP-BATTERY", "" + point.timestamp + " " + ((BatteryReading) point).getPercent());
+                }
+            }
+            else {
+
             }
         }
 
+        // COMBINE
+        ArrayList<VirtualSensorPoint> vsparr = combine(arr);
 
+        return vsparr;
+    }
 
+    private static ArrayList<VirtualSensorPoint> combine(ArrayList<ArrayList<SensorReading>> listOfSensorsReadings){
+        // The hash contains all sensors that are required for combination
 
-        return points;
+        long startTimestamp = Long.MIN_VALUE;
+        long stopTimestamp = Long.MIN_VALUE;
+
+        for( ArrayList<SensorReading> arr : listOfSensorsReadings ){
+            long tmpStart = arr.get(0).timestamp;
+            if (tmpStart > startTimestamp)
+                startTimestamp = tmpStart;
+            long tmpStop = arr.get(arr.size() - 1).timestamp;
+            if (tmpStop > stopTimestamp)
+                stopTimestamp = tmpStop;
+        }
+
+        // Let's take interval as 1s:
+        long start = startTimestamp;
+        long step = initWindowSizeMiliseconds;
+
+        // Initialize pointes which will run through all arrays
+        int[] pointers = new int[listOfSensorsReadings.size()];
+        for( int i = 0; i < listOfSensorsReadings.size(); i++ ){
+            pointers[i++] = -1;
+        }
+
+        ArrayList<VirtualSensorPoint> vsparr = new ArrayList<>();
+
+        while ( start <= stopTimestamp ) {
+
+            for (int i = 0; i < pointers.length; i++) {
+                ArrayList<SensorReading> readings = listOfSensorsReadings.get(i);
+                int sizeI = readings.size();
+                while (pointers[i]+1 < sizeI && readings.get(pointers[i]+1).timestamp <= start) {
+                    pointers[i]++;
+                }
+            }
+
+            VirtualSensorPoint vp = new VirtualSensorPoint();
+            // Fill the VirtualSensor
+            for (int i = 0; i < pointers.length; i++) {
+                SensorReading reading = listOfSensorsReadings.get(i).get(pointers[i]);
+                if (reading instanceof NoiseReading) {
+                    vp.setNoise(((NoiseReading) reading).getdbValue());
+                } else if (reading instanceof LightReading) {
+                    vp.setLight(((LightReading) reading).getLuxValue());
+                } else if (reading instanceof AccelerometerReading) {
+                    vp.setAccelerometer(((AccelerometerReading) reading).getX(),
+                            ((AccelerometerReading) reading).getY(),
+                            ((AccelerometerReading) reading).getZ());
+                } else if (reading instanceof GyroReading) {
+                    vp.setGyrometer(((GyroReading) reading).getGyroX(),
+                            ((GyroReading) reading).getGyroY(),
+                            ((GyroReading) reading).getGyroZ());
+                } else if (reading instanceof ProximityReading) {
+                    vp.setProximity(((ProximityReading) reading).getProximity());
+                }
+            }
+            vsparr.add(vp);
+            start += step;
+        }
+        return vsparr;
     }
 }

@@ -13,35 +13,16 @@ import java.util.ArrayList;
 
 import clustering.Cluster;
 import clustering.Point;
+import sensor.VirtualSensorPoint;
 
 /**
  * Created by ales on 19/07/16.
  */
 public class GraphPlot {
     public GraphView graph;
-    private ArrayList<Point> points;
-    private ArrayList<Cluster> clusters;
 
     public GraphPlot(GraphView graph){
         this.graph = graph;
-    }
-
-    public GraphPlot(GraphView graph, ArrayList<Point> points, ArrayList<Cluster> clusters){
-        this.graph = graph;
-        this.points = points;
-        this.clusters = clusters;
-    }
-
-    public void setPoint(ArrayList<Point> points){
-        this.points = points;
-    }
-
-    public void setClusters(ArrayList<Cluster> clusters){
-        this.clusters = clusters;
-    }
-
-    public void plot(){
-        plot(points, clusters);
     }
 
     /**
@@ -51,7 +32,7 @@ public class GraphPlot {
      * @param pointsInit    points
      * @param clustersInit  clusters
      */
-    public void plot(ArrayList<Point> pointsInit, ArrayList<Cluster> clustersInit) {
+    public void plot(ArrayList<VirtualSensorPoint> pointsInit, ArrayList<Cluster> clustersInit) {
 
         // Convert data of Points into DataPoint
         graph.removeAllSeries();
@@ -88,7 +69,7 @@ public class GraphPlot {
             }
         }
         for(int i = 0; i < clustersInit.size(); i++) {
-            double[] coord = clustersInit.get(i).getCentroid().getCoordinates();
+            double[] coord = clustersInit.get(i).getCoordinates();
             if (coord.length >= 2)
                 clusters[i] = new DataPoint(coord[0], coord[1]);
             else if (coord.length == 1)

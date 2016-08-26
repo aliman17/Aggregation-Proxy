@@ -8,31 +8,25 @@ import java.util.ArrayList;
  * the original object and cluster number.
  */
 public class Point {
-    private int numOfDimensions;
-    private double[] coordinates;
-    private Object referenceToOriginalObj;
-    private int clusterNumber;
+    protected int dimensions;
+    protected double[] coordinates;
+    protected int clusterNumber;
 
-    public Point(double[] coordinates, Object referenceToOriginalObj){
-        this.numOfDimensions = coordinates.length;
-        this.coordinates = new double[this.numOfDimensions];
-        setCoordinates(coordinates);
-        this.referenceToOriginalObj = referenceToOriginalObj;
-        this.clusterNumber = -1;    // at the beginning, cluster number is unknown
-        // so we initialize to -1
+    public Point(int dim){
+        this.dimensions = dim;
+        this.coordinates = new double[dim]; // initialized to 0 values
+        this.clusterNumber = -1; // has no cluster yet
     }
 
     public Point(double[] coordinates){
-        this.numOfDimensions = coordinates.length;
-        this.coordinates = new double[this.numOfDimensions];
-        setCoordinates(coordinates);
-        this.referenceToOriginalObj = null;
+        this.dimensions = coordinates.length;
+        this.coordinates = coordinates;
         this.clusterNumber = -1;    // at the beginning, cluster number is unknown
         // so we initialize to -1
     }
 
     public int getDimensions(){
-        return numOfDimensions;
+        return dimensions;
     }
 
     public double[] getCoordinates(){
@@ -43,22 +37,19 @@ public class Point {
         return clusterNumber;
     }
 
-    public Object getOriginalObject() {
-        return this.referenceToOriginalObj;
-    }
-
     public void setCoordinate(int i, double value){
+        if (this.coordinates == null)
+            this.coordinates = new double[this.dimensions];
         this.coordinates[i] = value;
     }
 
-    public void setCoordinates(ArrayList<Double> coordinates){
-        for (int i = 0; i < numOfDimensions; i++)
-            this.coordinates[i] = coordinates.get(i);
-    }
-
-    public void setCoordinates(double[] coordinates){
+    public void setCopyOfCoordinates(double[] coordinates){
         // We copy the array, that changes on passed array do not effect Point
-        for (int i = 0; i < numOfDimensions; i++)
+        if (this.coordinates == null){
+            this.dimensions = coordinates.length;
+            this.coordinates = new double[coordinates.length];
+        }
+        for (int i = 0; i < dimensions; i++)
             this.coordinates[i] = coordinates[i];
     }
 

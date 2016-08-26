@@ -8,6 +8,7 @@ import clustering.Clustering;
 import clustering.Point;
 import data.DataSourceHelper;
 import data.iDataSource;
+import sensor.VirtualSensorPoint;
 import state.State;
 
 /**
@@ -16,7 +17,7 @@ import state.State;
 public class PeriodicExecutionHandler implements iPeriodicExecutionHandler {
 
     public static PeriodicExecution periodicExecution;
-    public static ArrayList<Point> points;
+    public static ArrayList<VirtualSensorPoint> points;
     public static Clustering clustering;
     private State state;
     iDataSource dataSource;

@@ -1,12 +1,12 @@
 setwd("~/Desktop/GIT/Aggregation-Proxy/Measurements/TimestampComparison")
 
-light = read.table("./timestamps/lightTimestamps-6.txt")
+light = read.table("./timestamps/lightTimestamps-7.txt")
 light.n = nrow(light)
 
-battery = read.table("./timestamps/batteryTimestamps-6.txt")
+battery = read.table("./timestamps/batteryTimestamps-7.txt")
 battery.n = nrow(battery)
 
-noise = read.table("./timestamps/noiseTimestamps-6.txt")
+noise = read.table("./timestamps/noiseTimestamps-7.txt")
 noise.n = nrow(noise)
 
 # Plot realtime

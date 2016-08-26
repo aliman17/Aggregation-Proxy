@@ -9,27 +9,14 @@ import java.util.ArrayList;
  * other details. Additionally, it includes array of all points under its supervision -
  * the points, belonging to this cluster/centroid.
  */
-public class Cluster {
+public class Cluster extends Point {
 
     private int id;
-    private Point centroid;
     private ArrayList<Point> points;
 
-    public Cluster(int id){
+    public Cluster(int id, double[] coordinates){
+        super(coordinates);
         this.id = id;
-        this.centroid = null;
-        this.points = new ArrayList<Point>();
-    }
-
-    public Cluster(int id, double[] centroid){
-        this.id = id;
-        setCentroid(centroid);
-        this.points = new ArrayList<Point>();
-    }
-
-    public Cluster(int id, Point point){
-        this.id = id;
-        this.centroid = point;
         this.points = new ArrayList<Point>();
     }
 
@@ -37,20 +24,12 @@ public class Cluster {
         return id;
     }
 
-    public Point getCentroid(){
-        return centroid;
-    }
-
     public ArrayList<Point> getPoints(){
         return points;
     }
 
     public void setCentroid(double[] centroid){
-        this.centroid = new Point(centroid);
-    }
-
-    public void setCentroid(Point centroid){
-        this.centroid = centroid;
+        this.coordinates = centroid;
     }
 
     public void setPoints(ArrayList<Point> points){

@@ -7,10 +7,9 @@ import java.util.ArrayList;
 
 import clustering.Cluster;
 import clustering.Clustering;
-import clustering.Point;
 import data.DataSourceHelper;
-import sensor.SensorPoint;
 import data.iDataSource;
+import sensor.VirtualSensorPoint;
 import state.PossibleStatePoint;
 
 /**
@@ -18,7 +17,7 @@ import state.PossibleStatePoint;
  */
 public class PeriodicExecution extends Thread {
 
-    ArrayList<Point> points;
+    ArrayList<VirtualSensorPoint> points;
     Clustering clustering;
     iDataSource dataSource;
 
@@ -33,7 +32,7 @@ public class PeriodicExecution extends Thread {
 
     public static int id = 0;
 
-    public PeriodicExecution(state.State state, ArrayList<Point> points, Clustering clustering, iDataSource dataSource){
+    public PeriodicExecution(state.State state, ArrayList<VirtualSensorPoint> points, Clustering clustering, iDataSource dataSource){
         this.points = points;
         this.clustering = clustering;
         this.dataSource = dataSource;
@@ -55,9 +54,11 @@ public class PeriodicExecution extends Thread {
             // TODO: Instead of terminting here, we can probably still proceed
             return;
         }
+        Log.d("PERIODIC-INIT-SIZE", "" + points.size());
+
         clustering.compute(points);
 
-        ArrayList<Point> newPoints = new ArrayList<>();
+        ArrayList<VirtualSensorPoint> newPoints = new ArrayList<>();
 
         long currentTimestamp;
 
@@ -70,9 +71,9 @@ public class PeriodicExecution extends Thread {
             }
 
             // get latest data
-            Point newPoint = null;
+            VirtualSensorPoint newPoint = null;
             try {
-                newPoint = DataSourceHelper.getNextDataPoint( dataSource );
+                newPoint = DataSourceHelper.getNextVirtualSensorPoint( dataSource );
             } catch (RemoteException e) {
                 e.printStackTrace();
                 continue;
@@ -86,11 +87,10 @@ public class PeriodicExecution extends Thread {
             if (currentTimestamp - lastClusteringTimestamp > clusteringPeriodInMillisec) {
 
                 // remove old points
-                Point tmp = null;
+                VirtualSensorPoint tmp = null;
                 while (!points.isEmpty()){
-                    tmp = points.get(0);
-                    SensorPoint nsp = (SensorPoint) tmp.getOriginalObject();
-                    if (nsp.getTimestamp() < lastClusteringTimestamp)
+                    tmp = (VirtualSensorPoint) points.get(0);
+                    if (tmp.getTimestamp() < lastClusteringTimestamp)
                         points.remove(0);
                     else
                         // All points that are added later, should have better timestamp
@@ -110,7 +110,7 @@ public class PeriodicExecution extends Thread {
                     // cluster doesn't effect automatically also the possible state point
                     // It's important to have control over the possible states and how they
                     // are created or changed. So we want to avoid indirect intervention.
-                    psp.setCopy(cluster.getCentroid().getCoordinates());
+                    psp.setCopy(cluster.getCoordinates());
                     state.addPossibleState(psp);
                 }
 
