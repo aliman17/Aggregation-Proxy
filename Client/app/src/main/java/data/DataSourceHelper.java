@@ -2,13 +2,7 @@ package data;
 
 import android.os.RemoteException;
 import android.util.Log;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
@@ -26,8 +20,8 @@ import sensor.VirtualSensorPoint;
 public class DataSourceHelper {
 
     private static boolean bLight = true;
-    private static boolean bBattery = false;
-    private static boolean bNoise = false;
+    private static boolean bBattery = true;
+    private static boolean bNoise = true;
 
     private static final long oneDayMiliseconds = 86400000;
     private static final long initWindowSizeMiliseconds = 10000;
