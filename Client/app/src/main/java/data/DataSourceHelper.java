@@ -45,6 +45,7 @@ public class DataSourceHelper {
             virtualPoint.setBattery( battery.getPercent() );
         }
 
+        virtualPoint.finishSetting();
         return virtualPoint;
     }
 
@@ -160,6 +161,7 @@ public class DataSourceHelper {
                     vp.setProximity(((ProximityReading) reading).getProximity());
                 }
             }
+            vp.finishSetting();
             vsparr.add(vp);
             start += step;
         }

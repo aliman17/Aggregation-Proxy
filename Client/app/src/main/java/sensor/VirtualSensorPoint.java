@@ -26,13 +26,14 @@ public class VirtualSensorPoint extends Point {
     final int PROX = 9;
 
     private static final int DIMENSIONS = 10;
-    private boolean[] usedFields;
+    private double[] origValues; // original values
+    private double[] coordinates; // coordinates for clustering
 
     public VirtualSensorPoint(){
         super(DIMENSIONS);
-        usedFields = new boolean[DIMENSIONS];
+        origValues = new double[DIMENSIONS];
         for (int i = 0; i < DIMENSIONS; i++){
-            usedFields[i] = false;
+            origValues[i] = Double.NaN;
         }
     }
 
@@ -40,36 +41,46 @@ public class VirtualSensorPoint extends Point {
     // SETTER
 
     public void setNoise(double val){
-        this.coordinates[N] = val;
-        this.usedFields[N] = true;
+        this.origValues[N] = val;
     }
+
     public void setLight(double val){
-        this.coordinates[L] = val;
-        this.usedFields[L] = true;
+        this.origValues[L] = val;
     }
+
     public void setBattery(double val){
-        this.coordinates[B] = val;
-        this.usedFields[B] = true;
+        this.origValues[B] = val;
     }
+
     public void setAccelerometer(double x, double y, double z){
-        this.coordinates[ACCX] = x;
-        this.coordinates[ACCY] = y;
-        this.coordinates[ACCZ] = z;
-        this.usedFields[ACCX] = true;
-        this.usedFields[ACCY] = true;
-        this.usedFields[ACCZ] = true;
+        this.origValues[ACCX] = x;
+        this.origValues[ACCY] = y;
+        this.origValues[ACCZ] = z;
     }
+
     public void setGyrometer(double x, double y, double z){
-        this.coordinates[GYROX] = x;
-        this.coordinates[GYROY] = y;
-        this.coordinates[GYROZ] = z;
-        this.usedFields[GYROX] = true;
-        this.usedFields[GYROY] = true;
-        this.usedFields[GYROZ] = true;
+        this.origValues[GYROX] = x;
+        this.origValues[GYROY] = y;
+        this.origValues[GYROZ] = z;
     }
+
     public void setProximity(double val){
-        this.coordinates[PROX] = val;
-        this.usedFields[PROX] = true;
+        this.origValues[PROX] = val;
+    }
+
+    public void finishSetting(){
+        int size = 0;
+        for(int i = 0; i < DIMENSIONS; i++)
+            if (origValues[i] != Double.NaN)
+                size ++;
+        this.coordinates = new double[size];
+        int coordPtr = 0;
+        for(int i = 0; i < DIMENSIONS; i++){
+            if (origValues[i] != Double.NaN){
+                coordinates[coordPtr] = origValues[i];
+                coordPtr++;
+            }
+        }
     }
 
 
@@ -79,35 +90,42 @@ public class VirtualSensorPoint extends Point {
     }
 
     public double getNoise(){
-        return coordinates[N];
+        return origValues[N];
     }
 
     public double getLight(){
-        return coordinates[L];
+        return origValues[L];
     }
 
     public double getBattery() {
-        return coordinates[B];
+        return origValues[B];
     }
 
     public double[] getAccelerometer() {
         return new double[] {
-                coordinates[ACCX],
-                coordinates[ACCY],
-                coordinates[ACCZ]
+                origValues[ACCX],
+                origValues[ACCY],
+                origValues[ACCZ]
         };
     }
 
     public double[] getGryometer() {
         return new double[] {
-                coordinates[GYROX],
-                coordinates[GYROY],
-                coordinates[GYROZ]
+                origValues[GYROX],
+                origValues[GYROY],
+                origValues[GYROZ]
         };
     }
 
     public double getProximity() {
-        return coordinates[PROX];
+        return origValues[PROX];
     }
 
+    public double[] getCoordinates(){
+        return this.coordinates;
+    }
+
+    public double[] getOriginalValues(){
+        return origValues;
+    }
 }

@@ -79,8 +79,8 @@ public class PeriodicExecution extends Thread {
                 continue;
             }
             newPoints.add(newPoint);
-            int clusterNum = clustering.classify(newPoint);
-            Log.d("NEW_THREAD", "Goes to cluster " + clusterNum + " running:"+isRunning);
+            Cluster cluster = clustering.classify(newPoint);
+            Log.d("NEW_THREAD", "Goes to cluster " + cluster.getCoordinates() + " running:"+isRunning);
 
             // Re-cluster if there has passed enough time
             currentTimestamp = System.currentTimeMillis();
@@ -104,13 +104,13 @@ public class PeriodicExecution extends Thread {
                 clustering.compute(points);     // recompute clusters
                 state.clearPossibleStates();    // update possible states
 
-                for(Cluster cluster : clustering.getClusters()) {
+                for(Cluster c : clustering.getClusters()) {
                     PossibleStatePoint psp = new PossibleStatePoint();
                     // We store copy of the cluster coordinates, so that any change to the
                     // cluster doesn't effect automatically also the possible state point
                     // It's important to have control over the possible states and how they
                     // are created or changed. So we want to avoid indirect intervention.
-                    psp.setCopy(cluster.getCoordinates());
+                    psp.setCopy(c.getCoordinates());
                     state.addPossibleState(psp);
                 }
 

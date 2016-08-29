@@ -17,6 +17,7 @@ import clustering.KMeans;
 import clustering.Clustering;
 import data.iDataSource;
 import data.Nervousnet;
+import database.VirtualSensorDB;
 import periodic.PeriodicExecutionHandler;
 import plot.GraphPlot;
 import state.State;
@@ -46,7 +47,10 @@ public class Client extends Activity {
         // Create front-end view
         setContentView(R.layout.activity_client);
 
-        // Store element on the view in arguments
+        VirtualSensorDB.test(this);
+
+
+        /*// Store element on the view in arguments
         buttonConnect = (Button)findViewById(R.id.connect);
         buttonNervousnet = (Button)findViewById(R.id.nervousnet);
 
@@ -76,7 +80,7 @@ public class Client extends Activity {
         // Plot
         Log.d("Activity", "Init plot ...");
         GraphView graph_view = (GraphView) findViewById(R.id.graph);
-        graph = new GraphPlot(graph_view);
+        graph = new GraphPlot(graph_view);*/
 
     }
 

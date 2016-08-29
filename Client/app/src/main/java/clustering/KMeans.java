@@ -72,33 +72,16 @@ public class KMeans implements Clustering {
     }
 
     @Override
-    public int[] classify(ArrayList<Point> points) {
-
-        int[] classes = new int[points.size()];
-        int i = 0;
-        if (this.clusters != null){
-            for(Point point : points) {
-                int cluster = classify(point);
-                point.setCluster(cluster);
-                classes[i] = cluster;
-                i++;
-            }
-        }
-        Log.d("KMEANS", "New point classified!");
-        return classes;
-    }
-
-    @Override
-    public int classify(Point point) {
+    public Cluster classify(Point point) {
         double min = Double.MAX_VALUE;
-        int cluster = 0;
+        Cluster cluster = null;
 
         for(int i = 0; i < this.numOfClusters; i++) {
             Cluster c = clusters.get(i);
             double distance = Point.distance(this.numOfDimensions, point, c);
             if(distance < min){
                 min = distance;
-                cluster = i;
+                cluster = c;
             }
         }
         return cluster;
@@ -147,9 +130,9 @@ public class KMeans implements Clustering {
 
     private void assignCluster(List<? extends Point> points, ArrayList<Cluster> clusters) {
         for(Point point : points) {
-            int cluster = classify(point);
+            Cluster cluster = classify(point);
             point.setCluster(cluster);
-            clusters.get(cluster).addPoint(point);
+            cluster.addPoint(point);
         }
     }
 

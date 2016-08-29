@@ -10,19 +10,16 @@ import java.util.ArrayList;
 public class Point {
     protected int dimensions;
     protected double[] coordinates;
-    protected int clusterNumber;
+    protected Cluster cluster;
 
     public Point(int dim){
         this.dimensions = dim;
         this.coordinates = new double[dim]; // initialized to 0 values
-        this.clusterNumber = -1; // has no cluster yet
     }
 
     public Point(double[] coordinates){
         this.dimensions = coordinates.length;
         this.coordinates = coordinates;
-        this.clusterNumber = -1;    // at the beginning, cluster number is unknown
-        // so we initialize to -1
     }
 
     public int getDimensions(){
@@ -33,8 +30,8 @@ public class Point {
         return this.coordinates;
     }
 
-    public int getCluster(){
-        return clusterNumber;
+    public Cluster getCluster(){
+        return cluster;
     }
 
     public void setCoordinate(int i, double value){
@@ -53,8 +50,8 @@ public class Point {
             this.coordinates[i] = coordinates[i];
     }
 
-    public void setCluster(int clusterNumber){
-        this.clusterNumber = clusterNumber;
+    public void setCluster(Cluster c){
+        this.cluster = c;
     }
 
     public static double distance(int dimensions, Point p1, Point p2){
