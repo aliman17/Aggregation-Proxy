@@ -40,7 +40,7 @@ public class KMeans implements Clustering {
             //Clear cluster state
             clearClusters(clusters);
 
-            List<Point> lastCentroids = getCentroids(clusters);
+            List<Cluster> lastCentroids = getCentroids(clusters);
 
             //Assign points to the closer cluster
             boolean trainingPhase = true;
@@ -49,12 +49,13 @@ public class KMeans implements Clustering {
             //Calculate new centroids
             calculateCentroids(clusters);
 
-            List<Point> currentCentroids = getCentroids(clusters);
+            List<Cluster> currentCentroids = getCentroids(clusters);
 
             //Calculates total distance between new and old Centroids
             double distance = 0;
             for(int i = 0; i < lastCentroids.size(); i++)
-                distance += Point.distance(this.numOfDimensions, lastCentroids.get(i), currentCentroids.get(i));
+                distance += Util.distance(lastCentroids.get(i).getCentroid(),
+                        currentCentroids.get(i).getCentroid());
 
             if(distance == 0) {
                 finish = true;
@@ -65,7 +66,7 @@ public class KMeans implements Clustering {
         }
 
         for(Cluster c : clusters)
-            Log.d("KMEANS-final-centroids", Arrays.toString(c.getCoordinates()) + "");
+            Log.d("KMEANS-final-centroids", Arrays.toString(c.getCentroid()) + "");
 
         Log.d("KMEANS", "Computing clusters finished!");
         return clusters;
@@ -78,7 +79,23 @@ public class KMeans implements Clustering {
 
         for(int i = 0; i < this.numOfClusters; i++) {
             Cluster c = clusters.get(i);
-            double distance = Point.distance(this.numOfDimensions, point, c);
+            double distance = Util.distance( point.coordinates, c.getCentroid() );
+            if(distance < min){
+                min = distance;
+                cluster = c;
+            }
+        }
+        return cluster;
+    }
+
+    @Override
+    public Cluster classify(double[] point) {
+        double min = Double.MAX_VALUE;
+        Cluster cluster = null;
+
+        for(int i = 0; i < this.numOfClusters; i++) {
+            Cluster c = clusters.get(i);
+            double distance = Util.distance(c.getCentroid(), point);
             if(distance < min){
                 min = distance;
                 cluster = c;
@@ -95,10 +112,10 @@ public class KMeans implements Clustering {
 
     private void initClusters(ArrayList<? extends Point> points){
 
-        clusters = new ArrayList<Cluster>();
+        clusters = new ArrayList<>();
         int sizeOfPoints = points.size();
         Random rand = new Random();
-
+        Log.d("INIT-CLUSTER", "Size " + sizeOfPoints);
         // Choose random centroids
         for (int i = 0; i < this.numOfClusters; i++){
             // Get one of the points as an initial cluster
@@ -110,9 +127,9 @@ public class KMeans implements Clustering {
             // several times
             for( int j = 0; j < coordinates.length; j++ )
                 coordinates[j] += coordinates[j] * (1 + rand.nextDouble());
-            Cluster c = new Cluster(i, coordinates);
+            Cluster c = new Cluster(coordinates);
             clusters.add(c);
-            Log.d("KMEANS-init-centroids", Arrays.toString(c.getCoordinates()) + "");
+            Log.d("KMEANS-init-centroids", Arrays.toString(c.getCentroid()) + "");
         }
     }
 
@@ -122,7 +139,7 @@ public class KMeans implements Clustering {
         }
     }
 
-    private ArrayList<Point> getCentroids(ArrayList<Cluster> clusters) {
+    private List<Cluster> getCentroids(ArrayList<Cluster> clusters) {
         ArrayList centroids = new ArrayList();
         for(Cluster cluster : clusters) centroids.add(cluster);
         return centroids;

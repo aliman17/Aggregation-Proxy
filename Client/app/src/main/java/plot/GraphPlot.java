@@ -12,8 +12,7 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 import java.util.ArrayList;
 
 import clustering.Cluster;
-import clustering.Point;
-import sensor.VirtualSensorPoint;
+import virtualSensor.VirtualPoint;
 
 /**
  * Created by ales on 19/07/16.
@@ -32,7 +31,7 @@ public class GraphPlot {
      * @param pointsInit    points
      * @param clustersInit  clusters
      */
-    public void plot(ArrayList<VirtualSensorPoint> pointsInit, ArrayList<Cluster> clustersInit) {
+    public void plot(ArrayList<VirtualPoint> pointsInit, ArrayList<Cluster> clustersInit) {
 
         // Convert data of Points into DataPoint
         graph.removeAllSeries();
@@ -46,7 +45,7 @@ public class GraphPlot {
         double maxY = 2;
 
         for(int i = 0; i < pointsInit.size(); i++) {
-            double[] coord = pointsInit.get(i).getCoordinates();
+            double[] coord = pointsInit.get(i).getOriginal().getValues();
             if (coord.length >= 2) {
                 double x = coord[0];
                 double y = coord[1];
@@ -69,7 +68,7 @@ public class GraphPlot {
             }
         }
         for(int i = 0; i < clustersInit.size(); i++) {
-            double[] coord = clustersInit.get(i).getCoordinates();
+            double[] coord = clustersInit.get(i).getCentroid();
             if (coord.length >= 2)
                 clusters[i] = new DataPoint(coord[0], coord[1]);
             else if (coord.length == 1)

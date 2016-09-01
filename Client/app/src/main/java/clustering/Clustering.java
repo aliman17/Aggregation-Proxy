@@ -10,5 +10,6 @@ import java.util.ArrayList;
 public interface Clustering {
     public ArrayList<Cluster> compute(ArrayList<? extends Point> points);
     public Cluster classify(Point point);
+    public Cluster classify(double[] point);
     public ArrayList<Cluster> getClusters();
 }

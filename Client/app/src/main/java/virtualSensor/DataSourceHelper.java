@@ -1,4 +1,4 @@
-package data;
+package virtualSensor;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -12,23 +12,22 @@ import ch.ethz.coss.nervousnet.lib.LightReading;
 import ch.ethz.coss.nervousnet.lib.NoiseReading;
 import ch.ethz.coss.nervousnet.lib.ProximityReading;
 import ch.ethz.coss.nervousnet.lib.SensorReading;
-import sensor.VirtualSensorPoint;
-
+import data.iDataSource;
 /**
  * Created by ales on 03/08/16.
  */
 public class DataSourceHelper {
 
     private static boolean bLight = true;
-    private static boolean bBattery = true;
-    private static boolean bNoise = true;
+    private static boolean bBattery = false;
+    private static boolean bNoise = false;
 
     private static final long oneDayMiliseconds = 86400000;
     private static final long initWindowSizeMiliseconds = 10000;
 
-    public static VirtualSensorPoint getNextVirtualSensorPoint(iDataSource dataSource) throws RemoteException {
+    public static OriginalVirtualSensorPoint getNextVirtualSensorPoint(iDataSource dataSource) throws RemoteException {
 
-        VirtualSensorPoint virtualPoint = new VirtualSensorPoint();
+        OriginalVirtualSensorPoint virtualPoint = new OriginalVirtualSensorPoint();
 
         if (bLight) {
             LightReading light = dataSource.getLatestLightValue();
@@ -45,11 +44,10 @@ public class DataSourceHelper {
             virtualPoint.setBattery( battery.getPercent() );
         }
 
-        virtualPoint.finishSetting();
         return virtualPoint;
     }
 
-    public static ArrayList<VirtualSensorPoint> getInitData(iDataSource dataSource) throws RemoteException {
+    public static ArrayList<OriginalVirtualSensorPoint> getInitData(iDataSource dataSource) throws RemoteException {
 
         long stop = System.currentTimeMillis();
         long start = stop - oneDayMiliseconds;
@@ -99,12 +97,12 @@ public class DataSourceHelper {
         }
 
         // COMBINE
-        ArrayList<VirtualSensorPoint> vsparr = combine(arr);
+        ArrayList<OriginalVirtualSensorPoint> vsparr = combine(arr);
 
         return vsparr;
     }
 
-    private static ArrayList<VirtualSensorPoint> combine(ArrayList<ArrayList<SensorReading>> listOfSensorsReadings){
+    private static ArrayList<OriginalVirtualSensorPoint> combine(ArrayList<ArrayList<SensorReading>> listOfSensorsReadings){
         // The hash contains all sensors that are required for combination
 
         long startTimestamp = Long.MIN_VALUE;
@@ -129,7 +127,7 @@ public class DataSourceHelper {
             pointers[i++] = -1;
         }
 
-        ArrayList<VirtualSensorPoint> vsparr = new ArrayList<>();
+        ArrayList<OriginalVirtualSensorPoint> vsparr = new ArrayList<>();
 
         while ( start <= stopTimestamp ) {
 
@@ -141,7 +139,7 @@ public class DataSourceHelper {
                 }
             }
 
-            VirtualSensorPoint vp = new VirtualSensorPoint();
+            OriginalVirtualSensorPoint vp = new OriginalVirtualSensorPoint();
             // Fill the VirtualSensor
             for (int i = 0; i < pointers.length; i++) {
                 SensorReading reading = listOfSensorsReadings.get(i).get(pointers[i]);
@@ -161,7 +159,6 @@ public class DataSourceHelper {
                     vp.setProximity(((ProximityReading) reading).getProximity());
                 }
             }
-            vp.finishSetting();
             vsparr.add(vp);
             start += step;
         }

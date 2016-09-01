@@ -18,7 +18,7 @@ import clustering.Clustering;
 import data.iDataSource;
 import data.Nervousnet;
 import database.VirtualSensorDB;
-import periodic.PeriodicExecutionHandler;
+import periodic.PeriodicExecution;
 import plot.GraphPlot;
 import state.State;
 
@@ -35,6 +35,8 @@ public class Client extends Activity {
     OnClickListener buttonConnectOnClickListener;
     OnClickListener buttonNervousnetOnClickListener;
 
+    PeriodicExecution periodic;
+
     boolean isRunning = false;
 
     @Override
@@ -50,7 +52,7 @@ public class Client extends Activity {
         VirtualSensorDB.test(this);
 
 
-        /*// Store element on the view in arguments
+        // Store element on the view in arguments
         buttonConnect = (Button)findViewById(R.id.connect);
         buttonNervousnet = (Button)findViewById(R.id.nervousnet);
 
@@ -80,7 +82,7 @@ public class Client extends Activity {
         // Plot
         Log.d("Activity", "Init plot ...");
         GraphView graph_view = (GraphView) findViewById(R.id.graph);
-        graph = new GraphPlot(graph_view);*/
+        //graph = new GraphPlot(graph_view);
 
     }
 
@@ -118,19 +120,25 @@ public class Client extends Activity {
         this.buttonNervousnetOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                if (isRunning == false) {
-                    isRunning = true;
-                    buttonNervousnet.setText("Stop executing ...");
-                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler(state, clustering, dataSource);
-                    perHandler.start();
+            if (isRunning == false) {
+                Log.d("CLICK-BUTTON", "Start");
+                isRunning = true;
+                buttonNervousnet.setText("Stop executing ...");
+                periodic = new PeriodicExecution(state, clustering, dataSource);
+                periodic.start();  // new thread
+            }
+            else{
+                isRunning = false;
+                buttonNervousnet.setText("Get nervousnet data");
+                periodic.stopExecution();
+                try {
+                    periodic.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                else{
-                    isRunning = false;
-                    buttonNervousnet.setText("Get nervousnet data");
-                    PeriodicExecutionHandler perHandler = new PeriodicExecutionHandler();
-                    perHandler.stop();
-                    graph.plot(PeriodicExecutionHandler.points, PeriodicExecutionHandler.clustering.getClusters());
-                }
+                periodic = null;
+                //graph.plot(periodic.getVirtualPoints(), periodic.getClustering().getClusters());
+            }
             }
         };
     }

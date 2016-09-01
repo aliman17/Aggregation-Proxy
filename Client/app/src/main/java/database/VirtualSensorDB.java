@@ -11,11 +11,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import sensor.VirtualSensorPoint;
+import virtualSensor.ClusterVirtualSensorPoint;
+import virtualSensor.OriginalVirtualSensorPoint;
+import virtualSensor.VirtualPoint;
 
 public class VirtualSensorDB extends SQLiteOpenHelper {
 
@@ -94,7 +95,7 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public void add(VirtualSensorPoint point){
+    public void add(ClusterVirtualSensorPoint cluster, OriginalVirtualSensorPoint point){
         //Log.d("addSensorValue", String.valueOf(Arrays.toString(point.getCluster().getCoordinates())));
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
@@ -103,25 +104,25 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(vnoise, point.getNoise());
         values.put(vlight, point.getLight());
-        /*values.put(vbattery, point.getBattery());
+        values.put(vbattery, point.getBattery());
         values.put(vaccX, point.getAccelerometer()[0]);
         values.put(vaccY, point.getAccelerometer()[1]);
         values.put(vaccZ, point.getAccelerometer()[2]);
         values.put(vgyroX, point.getGryometer()[0]);
         values.put(vgyroY, point.getGryometer()[1]);
         values.put(vgyroZ, point.getGryometer()[2]);
-        values.put(vproxim, point.getProximity());*/
+        values.put(vproxim, point.getProximity());
 
-        values.put(vnoise, point.getNoise());
-        values.put(vlight, point.getLight());
-        /*values.put(vbattery, point.getBattery());
-        values.put(vaccX, point.getAccelerometer()[0]);
-        values.put(vaccY, point.getAccelerometer()[1]);
-        values.put(vaccZ, point.getAccelerometer()[2]);
-        values.put(vgyroX, point.getGryometer()[0]);
-        values.put(vgyroY, point.getGryometer()[1]);
-        values.put(vgyroZ, point.getGryometer()[2]);
-        values.put(vproxim, point.getProximity());*/
+        values.put(onoise, point.getNoise());
+        values.put(olight, point.getLight());
+        values.put(obattery, point.getBattery());
+        values.put(oaccX, point.getAccelerometer()[0]);
+        values.put(oaccY, point.getAccelerometer()[1]);
+        values.put(oaccZ, point.getAccelerometer()[2]);
+        values.put(ogyroX, point.getGryometer()[0]);
+        values.put(ogyroY, point.getGryometer()[1]);
+        values.put(ogyroZ, point.getGryometer()[2]);
+        values.put(oproxim, point.getProximity());
         // 3. insert
 
         db.insert(TABLE,    // table
@@ -132,7 +133,7 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
         db.close();
     }
 
-    public VirtualSensorPoint get(int id){
+    public VirtualPoint get(int id){
 
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
@@ -154,34 +155,47 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
 
         // 4. build object
 
-        //Log.d("getSensorValue("+id+")", cursor.getString(1));
-        VirtualSensorPoint vpoint = getVSP(cursor);
+        VirtualPoint vpoint = getVSP(cursor);
 
-        Log.d("DB-get", Arrays.toString(vpoint.getCoordinates()));
+        Log.d("DB-get-original", Arrays.toString(vpoint.getOriginal().getValues()));
+        Log.d("DB-get-cluster", Arrays.toString(vpoint.getCluster().getValues()));
         // 5. return
         return vpoint;
     }
 
-    private VirtualSensorPoint getVSP(Cursor cursor){
+    private VirtualPoint getVSP(Cursor cursor){
 
-        VirtualSensorPoint vp = new VirtualSensorPoint();
+        OriginalVirtualSensorPoint original = new OriginalVirtualSensorPoint();
+        ClusterVirtualSensorPoint cluster = new ClusterVirtualSensorPoint();
 
-        vp.setNoise( cursor.getDouble(2));
-        vp.setLight( cursor.getDouble(3));
-        vp.setBattery( cursor.getDouble(4));
-        vp.setAccelerometer( cursor.getDouble(5),
+        cluster.setNoise( cursor.getDouble(2));
+        cluster.setLight( cursor.getDouble(3));
+        cluster.setBattery( cursor.getDouble(4));
+        cluster.setAccelerometer( cursor.getDouble(5),
                 cursor.getDouble(6),
                 cursor.getDouble(7));
-        vp.setGyrometer( cursor.getDouble(8),
+        cluster.setGyrometer( cursor.getDouble(8),
                 cursor.getDouble(9),
                 cursor.getDouble(10));
-        vp.setProximity( cursor.getDouble(11));
-        vp.finishSetting();
-        return vp;
+        cluster.setProximity( cursor.getDouble(11));
+
+        cluster.setNoise( cursor.getDouble(12));
+        cluster.setLight( cursor.getDouble(13));
+        cluster.setBattery( cursor.getDouble(14));
+        cluster.setAccelerometer( cursor.getDouble(15),
+                cursor.getDouble(16),
+                cursor.getDouble(17));
+        cluster.setGyrometer( cursor.getDouble(18),
+                cursor.getDouble(19),
+                cursor.getDouble(20));
+        cluster.setProximity( cursor.getDouble(21));
+
+
+        return new VirtualPoint(cluster, original);
     }
 
-    public ArrayList<VirtualSensorPoint> getAll() {
-        ArrayList<VirtualSensorPoint> values = new ArrayList();
+    public ArrayList<VirtualPoint> getAll() {
+        ArrayList<VirtualPoint> values = new ArrayList();
 
         // 1. build the query
         String query = "SELECT  * FROM " + TABLE;
@@ -193,7 +207,7 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
         // 3. go over each row, build sensor value and add it to list
         if (cursor.moveToFirst()) {
             do {
-                VirtualSensorPoint vp = getVSP(cursor);
+                VirtualPoint vp = getVSP(cursor);
                 values.add(vp);
             } while (cursor.moveToNext());
         }
@@ -202,19 +216,21 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
 
     public static void test(Context context){
         Log.d("TEST", "Start ...");
-        VirtualSensorPoint vpoint = new VirtualSensorPoint();
+
+        OriginalVirtualSensorPoint original = new OriginalVirtualSensorPoint();
+        ClusterVirtualSensorPoint cluster = new ClusterVirtualSensorPoint();
 
         // Test adding values
-        vpoint.setNoise(123);
-        vpoint.setLight(511);
+        original.setNoise(123);
+        original.setLight(511);
 
         VirtualSensorDB db = new VirtualSensorDB(context);
-        db.add(vpoint);
+        db.add(cluster, original);
 
         // Test reading values
-        ArrayList<VirtualSensorPoint> list = db.getAll();
-        for( VirtualSensorPoint vp : list )
-            Log.d("VP",Arrays.toString(vp.getOriginalValues()));
+        ArrayList<VirtualPoint> list = db.getAll();
+        for( VirtualPoint vp : list )
+            Log.d("VP",Arrays.toString(vp.getCluster().getValues()) + " " + Arrays.toString(vp.getOriginal().getValues()));
 
         Log.d("TEST", "Stop");
     }
