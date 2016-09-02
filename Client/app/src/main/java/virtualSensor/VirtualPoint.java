@@ -2,8 +2,6 @@ package virtualSensor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import database.VirtualSensorDB;
-
 /**
  * Created by ales on 30/08/16.
  */

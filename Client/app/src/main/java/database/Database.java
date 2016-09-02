@@ -18,14 +18,14 @@ import virtualSensor.ClusterVirtualSensorPoint;
 import virtualSensor.OriginalVirtualSensorPoint;
 import virtualSensor.VirtualPoint;
 
-public class VirtualSensorDB extends SQLiteOpenHelper {
+public class Database extends SQLiteOpenHelper implements iDatabase {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "VirtualSensorDB";
     private static final String TABLE = "VirtualSensor";
     private static final String KEY_ID = "id";
 
-    private static final String vtimestamp = "VTimestamp";
+    private static final String timestamp = "VTimestamp";
     private static final String vnoise = "VNoise";
     private static final String vlight = "VLight";
     private static final String vbattery = "VBattery";
@@ -48,7 +48,7 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
     private static final String ogyroZ = "OgyroZ";
     private static final String oproxim = "OProximity";
 
-    public VirtualSensorDB(Context context) {
+    public Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -59,7 +59,8 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
                 KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 
                 // Virtual sensor data
-                vtimestamp +" NUMERIC," +
+                timestamp +" NUMERIC," +
+
                 vnoise +" REAL," +
                 vlight  +" REAL," +
                 vbattery  +" REAL," +
@@ -95,34 +96,57 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public void add(ClusterVirtualSensorPoint cluster, OriginalVirtualSensorPoint point){
-        //Log.d("addSensorValue", String.valueOf(Arrays.toString(point.getCluster().getCoordinates())));
+    public void add(double timestampd,
+                    double vnoised,
+                    double vlightd,
+                    double vbatteryd,
+                    double vaccxd,
+                    double vaccyd,
+                    double vacczd,
+                    double vgyroxd,
+                    double vgyroyd,
+                    double vgyrozd,
+                    double vproxd,
+                    double onoised,
+                    double olightd,
+                    double obatteryd,
+                    double oaccxd,
+                    double oaccyd,
+                    double oacczd,
+                    double ogyroxd,
+                    double ogyroyd,
+                    double ogyrozd,
+                    double oproxd){
+
+        Log.d("DATABASE", "Start inserting values ...");
+
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(vnoise, point.getNoise());
-        values.put(vlight, point.getLight());
-        values.put(vbattery, point.getBattery());
-        values.put(vaccX, point.getAccelerometer()[0]);
-        values.put(vaccY, point.getAccelerometer()[1]);
-        values.put(vaccZ, point.getAccelerometer()[2]);
-        values.put(vgyroX, point.getGryometer()[0]);
-        values.put(vgyroY, point.getGryometer()[1]);
-        values.put(vgyroZ, point.getGryometer()[2]);
-        values.put(vproxim, point.getProximity());
+        values.put(timestamp, timestampd);
+        values.put(vnoise, vnoised);
+        values.put(vlight, vlightd);
+        values.put(vbattery, vbatteryd);
+        values.put(vaccX, vaccxd);
+        values.put(vaccY, vaccyd);
+        values.put(vaccZ, vacczd);
+        values.put(vgyroX, vgyroxd);
+        values.put(vgyroY, vgyroyd);
+        values.put(vgyroZ, vgyrozd);
+        values.put(vproxim, vproxd);
 
-        values.put(onoise, point.getNoise());
-        values.put(olight, point.getLight());
-        values.put(obattery, point.getBattery());
-        values.put(oaccX, point.getAccelerometer()[0]);
-        values.put(oaccY, point.getAccelerometer()[1]);
-        values.put(oaccZ, point.getAccelerometer()[2]);
-        values.put(ogyroX, point.getGryometer()[0]);
-        values.put(ogyroY, point.getGryometer()[1]);
-        values.put(ogyroZ, point.getGryometer()[2]);
-        values.put(oproxim, point.getProximity());
+        values.put(onoise, onoised);
+        values.put(olight, olightd);
+        values.put(obattery, obatteryd);
+        values.put(oaccX, oaccxd);
+        values.put(oaccY, oaccyd);
+        values.put(oaccZ, oacczd);
+        values.put(ogyroX, ogyroxd);
+        values.put(ogyroY, ogyroyd);
+        values.put(ogyroZ, ogyrozd);
+        values.put(oproxim, oproxd);
         // 3. insert
 
         db.insert(TABLE,    // table
@@ -131,6 +155,45 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
 
         // 4. close
         db.close();
+        Log.d("DATABASE", "Inserting values done");
+    }
+
+    @Override
+    public void update(double timestampd, double vnoised, double vlightd, double vbatteryd,
+                       double vaccxd, double vaccyd, double vacczd, double vgyroxd, double vgyroyd,
+                       double vgyrozd, double vproxd, double onoised, double olightd, double obatteryd,
+                       double oaccxd, double oaccyd, double oacczd, double ogyroxd, double ogyroyd,
+                       double ogyrozd, double oproxd) {
+
+    }
+
+
+
+    @Override
+    public VirtualPoint get(double timestampQuery) {
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM "+TABLE+" WHERE "+timestamp+" = "+timestampQuery, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build object
+
+        VirtualPoint vpoint = getVSP(cursor);
+
+        Log.d("DB-get-original", Arrays.toString(vpoint.getOriginal().getValues()));
+        Log.d("DB-get-cluster", Arrays.toString(vpoint.getCluster().getValues()));
+        // 5. return
+        return vpoint;
+    }
+
+    @Override
+    public void delete(double timestampDelete) {
+        Log.d("DATABASE", "Delete element " + timestampDelete);
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "DELETE FROM "+TABLE+" WHERE "+timestamp+" = "+timestampDelete;
+        db.execSQL(sql);
     }
 
     public VirtualPoint get(int id){
@@ -217,15 +280,11 @@ public class VirtualSensorDB extends SQLiteOpenHelper {
     public static void test(Context context){
         Log.d("TEST", "Start ...");
 
-        OriginalVirtualSensorPoint original = new OriginalVirtualSensorPoint();
-        ClusterVirtualSensorPoint cluster = new ClusterVirtualSensorPoint();
-
-        // Test adding values
-        original.setNoise(123);
-        original.setLight(511);
-
-        VirtualSensorDB db = new VirtualSensorDB(context);
-        db.add(cluster, original);
+        Database db = new Database(context);
+        db.add(1, 2, 3, 4, 5, 6, 7, 8, 9,
+                1, 2, 3, 4, 5, 6, 7, 8, 9,
+                1, 2, 3
+        );
 
         // Test reading values
         ArrayList<VirtualPoint> list = db.getAll();

@@ -1,16 +1,13 @@
 package clustering;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
 /**
  * Created by ales on 20/07/16.
  * This class represents one point with its own coordinates. It keeps reference to
  * the original object and cluster number.
  */
-public class Point {
+public class Point implements iPoint{
     protected double[] coordinates;
-    protected Cluster cluster;
+    protected iCluster cluster;
     protected Object reference;
 
     public Point(double[] coordinates){
@@ -30,7 +27,7 @@ public class Point {
         return this.coordinates;
     }
 
-    public Cluster getCluster(){
+    public iCluster getCluster(){
         return cluster;
     }
 
@@ -42,7 +39,7 @@ public class Point {
         this.reference = ref;
     }
 
-    public void setCluster(Cluster c){
+    public void setCluster(iCluster c){
         this.cluster = c;
     }
 

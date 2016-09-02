@@ -1,7 +1,5 @@
 package virtualSensor;
 
-import clustering.Point;
-
 /**
  * Created by ales on 30/08/16.
  */

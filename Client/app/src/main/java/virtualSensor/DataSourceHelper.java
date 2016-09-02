@@ -22,29 +22,32 @@ public class DataSourceHelper {
     private static boolean bBattery = false;
     private static boolean bNoise = false;
 
-    private static final long oneDayMiliseconds = 86400000;
+    private static final long oneDayMiliseconds = 86400; //000
     private static final long initWindowSizeMiliseconds = 10000;
 
     public static OriginalVirtualSensorPoint getNextVirtualSensorPoint(iDataSource dataSource) throws RemoteException {
 
-        OriginalVirtualSensorPoint virtualPoint = new OriginalVirtualSensorPoint();
+        OriginalVirtualSensorPoint original = new OriginalVirtualSensorPoint();
 
         if (bLight) {
             LightReading light = dataSource.getLatestLightValue();
-            virtualPoint.setLight( light.getLuxValue() );
+            original.setLight( light.getLuxValue() );
         }
 
         if (bNoise) {
             NoiseReading noise = dataSource.getLatestNoiseValue();
-            virtualPoint.setNoise( noise.getdbValue() );
+            original.setNoise( noise.getdbValue() );
         }
 
         if (bBattery) {
             BatteryReading battery = dataSource.getLatestBatteryValue();
-            virtualPoint.setBattery( battery.getPercent() );
+            original.setBattery( battery.getPercent() );
         }
 
-        return virtualPoint;
+        // Set current time
+        original.setTimestamp(System.currentTimeMillis());
+
+        return original;
     }
 
     public static ArrayList<OriginalVirtualSensorPoint> getInitData(iDataSource dataSource) throws RemoteException {
@@ -103,11 +106,11 @@ public class DataSourceHelper {
     }
 
     private static ArrayList<OriginalVirtualSensorPoint> combine(ArrayList<ArrayList<SensorReading>> listOfSensorsReadings){
-        // The hash contains all sensors that are required for combination
 
         long startTimestamp = Long.MIN_VALUE;
         long stopTimestamp = Long.MIN_VALUE;
 
+        //1. get the beginning and end point of the frame, used for cuting into intervals
         for( ArrayList<SensorReading> arr : listOfSensorsReadings ){
             long tmpStart = arr.get(0).timestamp;
             if (tmpStart > startTimestamp)
@@ -139,27 +142,31 @@ public class DataSourceHelper {
                 }
             }
 
-            OriginalVirtualSensorPoint vp = new OriginalVirtualSensorPoint();
+            OriginalVirtualSensorPoint original = new OriginalVirtualSensorPoint();
+
+            // Set timestamp of the combined virtual point
+
+            original.setTimestamp(start);
             // Fill the VirtualSensor
             for (int i = 0; i < pointers.length; i++) {
                 SensorReading reading = listOfSensorsReadings.get(i).get(pointers[i]);
                 if (reading instanceof NoiseReading) {
-                    vp.setNoise(((NoiseReading) reading).getdbValue());
+                    original.setNoise(((NoiseReading) reading).getdbValue());
                 } else if (reading instanceof LightReading) {
-                    vp.setLight(((LightReading) reading).getLuxValue());
+                    original.setLight(((LightReading) reading).getLuxValue());
                 } else if (reading instanceof AccelerometerReading) {
-                    vp.setAccelerometer(((AccelerometerReading) reading).getX(),
+                    original.setAccelerometer(((AccelerometerReading) reading).getX(),
                             ((AccelerometerReading) reading).getY(),
                             ((AccelerometerReading) reading).getZ());
                 } else if (reading instanceof GyroReading) {
-                    vp.setGyrometer(((GyroReading) reading).getGyroX(),
+                    original.setGyrometer(((GyroReading) reading).getGyroX(),
                             ((GyroReading) reading).getGyroY(),
                             ((GyroReading) reading).getGyroZ());
                 } else if (reading instanceof ProximityReading) {
-                    vp.setProximity(((ProximityReading) reading).getProximity());
+                    original.setProximity(((ProximityReading) reading).getProximity());
                 }
             }
-            vsparr.add(vp);
+            vsparr.add(original);
             start += step;
         }
         return vsparr;

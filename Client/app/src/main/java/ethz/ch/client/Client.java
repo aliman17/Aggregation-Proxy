@@ -14,10 +14,11 @@ import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
 
 import clustering.KMeans;
-import clustering.Clustering;
+import clustering.iClustering;
 import data.iDataSource;
 import data.Nervousnet;
-import database.VirtualSensorDB;
+import database.Database;
+import database.iDatabase;
 import periodic.PeriodicExecution;
 import plot.GraphPlot;
 import state.State;
@@ -26,7 +27,8 @@ public class Client extends Activity {
 
     State state;
     iDataSource dataSource;
-    Clustering clustering;
+    iDatabase database;
+    iClustering clustering;
     GraphPlot graph;
     int numOfClusters = 3;
     int numOfDimensions = 10;
@@ -49,7 +51,7 @@ public class Client extends Activity {
         // Create front-end view
         setContentView(R.layout.activity_client);
 
-        VirtualSensorDB.test(this);
+        Database.test(this);
 
 
         // Store element on the view in arguments
@@ -64,6 +66,9 @@ public class Client extends Activity {
 
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
         buttonNervousnet.setOnClickListener(buttonNervousnetOnClickListener);
+
+        // Database
+        database = new Database(this);
 
         // Get sensors data
         Log.d("Activity", "Init nervousnet ...");
@@ -124,7 +129,7 @@ public class Client extends Activity {
                 Log.d("CLICK-BUTTON", "Start");
                 isRunning = true;
                 buttonNervousnet.setText("Stop executing ...");
-                periodic = new PeriodicExecution(state, clustering, dataSource);
+                periodic = new PeriodicExecution(state, clustering, dataSource, database);
                 periodic.start();  // new thread
             }
             else{

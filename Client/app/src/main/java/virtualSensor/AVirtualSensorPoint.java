@@ -28,6 +28,10 @@ public abstract class AVirtualSensorPoint {
 
     // SETTER
 
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public void setNoise(double val){
         this.values[N] = val;
     }

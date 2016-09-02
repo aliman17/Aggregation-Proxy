@@ -6,9 +6,11 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import clustering.Cluster;
-import clustering.Clustering;
 import clustering.Point;
+import clustering.iCluster;
+import clustering.iClustering;
+import clustering.iPoint;
+import database.iDatabase;
 import virtualSensor.ClusterVirtualSensorPoint;
 import virtualSensor.DataSourceHelper;
 import data.iDataSource;
@@ -21,8 +23,9 @@ import state.PossibleStatePoint;
  */
 public class PeriodicExecution extends Thread {
 
-    ArrayList<Point> points;
-    Clustering clustering;
+    iDatabase database;
+    ArrayList<iPoint> points;
+    iClustering clustering;
     iDataSource dataSource;
 
     state.State state;
@@ -30,16 +33,18 @@ public class PeriodicExecution extends Thread {
     public boolean isRunning = false;
 
     private static long lastClusteringTimestamp;    // epoch in milliseconds
-    private static final long clusteringPeriodInMillisec = 5000;  // in milliseconds
+    private static final long clusteringIntervalInMillisec = 5000;  // in milliseconds
 
     private static int sleepTime = 100;
 
     public static int id = 0;
 
-    public PeriodicExecution(state.State state, Clustering clustering, iDataSource dataSource){
+    public PeriodicExecution(state.State state, iClustering clustering, iDataSource dataSource,
+                             iDatabase database){
+        this.state = state;             // we'll be updating state.possibleStates periodically
         this.clustering = clustering;
         this.dataSource = dataSource;
-        this.state = state;             // we'll be updating state.possibleStates periodically
+        this.database = database;
         isRunning = false;
     }
 
@@ -49,7 +54,9 @@ public class PeriodicExecution extends Thread {
         Log.d("PERIODICITY", "Start periodic execution ...");
         this.isRunning = true;
 
-        points = new ArrayList<Point>();
+        points = new ArrayList<iPoint>();
+
+        // 1. Get virtual sensor data
 
         try {
             ArrayList<OriginalVirtualSensorPoint> original = DataSourceHelper.getInitData( dataSource );
@@ -65,9 +72,18 @@ public class PeriodicExecution extends Thread {
         }
         Log.d("PERIODIC-INIT-SIZE", "" + points.size());
 
+        // 2. compute clusters
         clustering.compute(points);
 
-        ArrayList<Point> newPoints = new ArrayList<>();
+        // 3. add new points to database
+        for( iPoint p : points ){
+            VirtualPoint vp = (VirtualPoint)p.getReference();
+            vp.setCluster(new ClusterVirtualSensorPoint(p.getCoordinates()));
+            Log.d("TEST", "TEST");
+            this.addVPtoDB(vp);
+        }
+
+        ArrayList<iPoint> newPoints = new ArrayList<>();
 
         long currentTimestamp;
 
@@ -87,10 +103,10 @@ public class PeriodicExecution extends Thread {
                 e.printStackTrace();
                 continue;
             }
-            Point newPoint = new Point(newOrigPoint.getValues(), new VirtualPoint(null, newOrigPoint));
+            iPoint newPoint = new Point(newOrigPoint.getValues(), new VirtualPoint(null, newOrigPoint));
 
             // 3. compute cluster
-            Cluster cluster = clustering.classify(newOrigPoint.getValues());
+            iCluster cluster = clustering.classify(newOrigPoint.getValues());
 
             // 4. create virtual point
             ClusterVirtualSensorPoint newCVirtualPoint = new ClusterVirtualSensorPoint(cluster.getCentroid());
@@ -101,15 +117,16 @@ public class PeriodicExecution extends Thread {
 
             // 5. Re-cluster if there has passed enough time
             currentTimestamp = System.currentTimeMillis();
-            if (currentTimestamp - lastClusteringTimestamp > clusteringPeriodInMillisec) {
+            if (currentTimestamp - lastClusteringTimestamp > clusteringIntervalInMillisec) {
 
                 // 6. remove old points
                 Log.d("PERIODIC", "Remove old points");
-                Point tmp = null;
+                iPoint tmp = null;
                 while (!points.isEmpty()){
                     tmp = points.get(0);
                     if (((VirtualPoint)tmp.getReference()).getOriginal().getTimestamp() < lastClusteringTimestamp) {
                         points.remove(0);
+                        database.delete(((VirtualPoint) tmp.getReference()).getOriginal().getTimestamp());
                     }
                     else
                         // All points that are added later, should have better timestamp
@@ -119,12 +136,15 @@ public class PeriodicExecution extends Thread {
                 }
                 // 7. add new points
                 points.addAll(newPoints);       // add new points
+                for (iPoint p : newPoints){
+                    this.addVPtoDB((VirtualPoint) p.getReference());
+                }
                 newPoints.clear();              // reset temporary storage for new ones
                 clustering.compute(points);     // recompute clusters
                 state.clearPossibleStates();    // update possible states
 
                 // 8. Recluster everything
-                for(Cluster c : clustering.getClusters()) {
+                for(iCluster c : clustering.getClusters()) {
                     PossibleStatePoint psp = new PossibleStatePoint();
                     // We store copy of the cluster coordinates, so that any change to the
                     // cluster doesn't effect automatically also the possible state point
@@ -147,7 +167,35 @@ public class PeriodicExecution extends Thread {
         this.isRunning = false;
     }
 
-    public Clustering getClustering(){
+    public iClustering getClustering(){
         return this.clustering;
+    }
+
+
+    public void addVPtoDB(VirtualPoint vp){
+        ClusterVirtualSensorPoint cluster = vp.getCluster();
+        OriginalVirtualSensorPoint original = vp.getOriginal();
+        database.add(original.getTimestamp(),
+                cluster.getNoise(),
+                cluster.getLight(),
+                cluster.getBattery(),
+                cluster.getAccelerometer()[0],
+                cluster.getAccelerometer()[1],
+                cluster.getAccelerometer()[2],
+                cluster.getGryometer()[0],
+                cluster.getGryometer()[1],
+                cluster.getGryometer()[2],
+                cluster.getProximity(),
+                original.getNoise(),
+                original.getLight(),
+                original.getBattery(),
+                original.getAccelerometer()[0],
+                original.getAccelerometer()[1],
+                original.getAccelerometer()[2],
+                original.getGryometer()[0],
+                original.getGryometer()[1],
+                original.getGryometer()[2],
+                original.getProximity()
+        );
     }
 }

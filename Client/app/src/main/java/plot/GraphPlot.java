@@ -11,7 +11,7 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 
 import java.util.ArrayList;
 
-import clustering.Cluster;
+import clustering.iCluster;
 import virtualSensor.VirtualPoint;
 
 /**
@@ -31,7 +31,7 @@ public class GraphPlot {
      * @param pointsInit    points
      * @param clustersInit  clusters
      */
-    public void plot(ArrayList<VirtualPoint> pointsInit, ArrayList<Cluster> clustersInit) {
+    public void plot(ArrayList<VirtualPoint> pointsInit, ArrayList<iCluster> clustersInit) {
 
         // Convert data of Points into DataPoint
         graph.removeAllSeries();
