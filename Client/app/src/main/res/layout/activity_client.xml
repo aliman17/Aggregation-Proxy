@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,40 +12,81 @@
     android:orientation="vertical"
     tools:context=".Client" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:autoLink="web"
-        android:text="Aliman application"
-        android:textStyle="bold" />
-    <Button
-        android:id="@+id/nervousnet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="get nervousnet data"/>
-    <Button
-        android:id="@+id/connect"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Send"/>
-    <TextView
-        android:id="@+id/sendResponse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="..."/>
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <com.jjoe64.graphview.GraphView
-        android:layout_width="match_parent"
-        android:layout_height="200dip"
-        android:title="Graph Title"
-        android:id="@+id/graph"
-        android:layout_below="@+id/pointtext"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:autoLink="web"
+                android:text="Aliman application"
+                android:textStyle="bold" />
+            <Button
+                android:id="@+id/nervousnet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="get nervousnet data"/>
+            <Button
+                android:id="@+id/connect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Send"/>
+            <TextView
+                android:id="@+id/sendResponse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."/>
 
-    <TextView
-        android:id="@+id/textNervousnet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="..."/>
+            <com.jjoe64.graphview.GraphView
+                android:layout_width="match_parent"
+                android:layout_height="200dip"
+                android:title="Graph Title"
+                android:id="@+id/graph"
+                android:layout_below="@+id/pointtext"/>
+
+            <TextView
+                android:id="@+id/textNervousnet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></LinearLayout>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Noise"
+                android:id="@+id/checkBox"
+                android:checked="true" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Light"
+                android:id="@+id/checkBox2"
+                android:checked="true" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Battery"
+                android:id="@+id/checkBox3"
+                android:checked="false" />
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
 
 </LinearLayout>
