@@ -196,6 +196,20 @@ public class Database extends SQLiteOpenHelper implements iDatabase {
         db.execSQL(sql);
     }
 
+    @Override
+    public void deleteTable() {
+        Log.d("DATABASE", "Delete table " + TABLE);
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "DROP TABLE "+TABLE;
+        db.execSQL(sql);
+    }
+
+    @Override
+    public void initTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        onCreate(db);
+    }
+
     public VirtualPoint get(int id){
 
         // 1. get reference to readable DB

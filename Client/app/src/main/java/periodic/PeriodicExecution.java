@@ -10,6 +10,7 @@ import clustering.Point;
 import clustering.iCluster;
 import clustering.iClustering;
 import clustering.iPoint;
+import database.Database;
 import database.iDatabase;
 import virtualSensor.ClusterVirtualSensorPoint;
 import virtualSensor.DataSourceHelper;
@@ -154,7 +155,20 @@ public class PeriodicExecution extends Thread {
                     state.addPossibleState(psp);
                 }
 
-                // 9. Update database
+                // 9. Update database -
+                database.deleteTable();
+                database.initTable();
+                for (iPoint p : points){
+                    VirtualPoint vp = (VirtualPoint) p.getReference();
+                    OriginalVirtualSensorPoint original = vp.getOriginal();
+                    ClusterVirtualSensorPoint cl = vp.getCluster();
+                    database.add(original.getTimestamp(), cl.getNoise(), cl.getLight(), cl.getBattery(),
+                            cl.getAccelerometer()[0], cl.getAccelerometer()[1], cl.getAccelerometer()[2],
+                            cl.getGryometer()[0], cl.getGryometer()[1], cl.getGryometer()[2], cl.getProximity(),
+                            original.getNoise(), original.getLight(), original.getBattery(),
+                            original.getAccelerometer()[0], original.getAccelerometer()[1], original.getAccelerometer()[2],
+                            original.getGryometer()[0], original.getGryometer()[1], original.getGryometer()[2], original.getProximity());
+                }
 
                 lastClusteringTimestamp = currentTimestamp; // Update and shift 'window for clustering'
             }

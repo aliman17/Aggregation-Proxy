@@ -54,4 +54,8 @@ public interface iDatabase {
     public VirtualPoint get(double timestamp);
 
     public void delete(double timestamp);
+
+    public void deleteTable();
+
+    public void initTable();
 }
