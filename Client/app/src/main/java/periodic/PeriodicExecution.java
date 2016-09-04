@@ -10,13 +10,12 @@ import clustering.Point;
 import clustering.iCluster;
 import clustering.iClustering;
 import clustering.iPoint;
-import database.Database;
 import database.iDatabase;
-import virtualSensor.ClusterVirtualSensorPoint;
-import virtualSensor.DataSourceHelper;
+import virtual.ClusterVirtualSensorPoint;
+import virtual.DataSourceHelper;
 import data.iDataSource;
-import virtualSensor.OriginalVirtualSensorPoint;
-import virtualSensor.VirtualPoint;
+import virtual.OriginalVirtualSensorPoint;
+import virtual.VirtualPoint;
 import state.PossibleStatePoint;
 
 /**

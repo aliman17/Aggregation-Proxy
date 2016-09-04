@@ -1,4 +1,4 @@
-package virtualSensor;
+package virtual;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

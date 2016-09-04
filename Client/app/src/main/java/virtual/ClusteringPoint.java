@@ -1,4 +1,4 @@
-package virtualSensor;
+package virtual;
 
 import clustering.Point;
 

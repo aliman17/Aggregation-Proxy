@@ -51,40 +51,33 @@ public class Client extends Activity {
         // Create front-end view
         setContentView(R.layout.activity_client);
 
-        Database.test(this);
-
-
-        // Store element on the view in arguments
+        // 1. Initialize buttons
         buttonConnect = (Button)findViewById(R.id.connect);
         buttonNervousnet = (Button)findViewById(R.id.nervousnet);
-
-        sendResponse = (TextView)findViewById(R.id.sendResponse);
-        textNervousnet = (TextView)findViewById(R.id.textNervousnet);
-
         initButtonConnectOnClickListener(this);
         initButtonNervousnet(this);
-
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
         buttonNervousnet.setOnClickListener(buttonNervousnetOnClickListener);
 
-        // Database
+        // 2. Initialize text
+        sendResponse = (TextView)findViewById(R.id.sendResponse);
+        textNervousnet = (TextView)findViewById(R.id.textNervousnet);
+
+        // 3. Initialize database
         database = new Database(this);
 
-        // Get sensors data
-        Log.d("Activity", "Init nervousnet ...");
+        // 4. Initialize data source
         Nervousnet nervousnet = new Nervousnet(this);
         nervousnet.connect();
         dataSource = nervousnet;
 
-        // Clustering
-        Log.d("Activity", "Init clustering ...");
+        // 5. Define clustering algorithm
         clustering = new KMeans(numOfDimensions, numOfClusters);
 
-        // Initialize state of the client
-        Log.d("Activity", "Init state ...");
+        // 6. Initialize states
         state = new State(this);
 
-        // Plot
+        // 7. Plot
         Log.d("Activity", "Init plot ...");
         GraphView graph_view = (GraphView) findViewById(R.id.graph);
         //graph = new GraphPlot(graph_view);

@@ -1,4 +1,4 @@
-package virtualSensor;
+package virtual;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -13,6 +13,8 @@ import ch.ethz.coss.nervousnet.lib.NoiseReading;
 import ch.ethz.coss.nervousnet.lib.ProximityReading;
 import ch.ethz.coss.nervousnet.lib.SensorReading;
 import data.iDataSource;
+import sensor.ActiveSensors;
+
 /**
  * Created by ales on 03/08/16.
  */

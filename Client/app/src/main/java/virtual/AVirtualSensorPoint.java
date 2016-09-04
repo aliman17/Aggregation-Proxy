@@ -1,4 +1,4 @@
-package virtualSensor;
+package virtual;
 
 /**
  * Created by ales on 30/08/16.

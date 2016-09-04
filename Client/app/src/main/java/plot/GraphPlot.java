@@ -12,7 +12,7 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 import java.util.ArrayList;
 
 import clustering.iCluster;
-import virtualSensor.VirtualPoint;
+import virtual.VirtualPoint;
 
 /**
  * Created by ales on 19/07/16.

@@ -1,6 +1,6 @@
 package database;
 
-import virtualSensor.VirtualPoint;
+import virtual.VirtualPoint;
 
 /**
  * Created by ales on 01/09/16.

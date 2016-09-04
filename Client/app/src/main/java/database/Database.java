@@ -14,9 +14,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import virtualSensor.ClusterVirtualSensorPoint;
-import virtualSensor.OriginalVirtualSensorPoint;
-import virtualSensor.VirtualPoint;
+import virtual.ClusterVirtualSensorPoint;
+import virtual.OriginalVirtualSensorPoint;
+import virtual.VirtualPoint;
 
 public class Database extends SQLiteOpenHelper implements iDatabase {
 
