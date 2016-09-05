@@ -38,9 +38,8 @@ interface NervousnetRemote
 	    */
 	    void getReadings(long sensorType, long startTime, long endTime,  RemoteCallback cb);
 	    
-        void getSensorIDs(RemoteCallback cb);
-
-        void getSensorLabels(RemoteCallback cb);
+        long[] getSensorIDs();
+        String[] getSensorLabels();
 	}
 	/*Methods to be added
 	getAverage, getCorrelation, getEntropy, getKMeans,

@@ -5,6 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/Client.iml" filepath="$PROJECT_DIR$/Client.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/nervousnetLIB/nervousnetLIB.iml" filepath="$PROJECT_DIR$/nervousnetLIB/nervousnetLIB.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nervousnetLIB/nervousnetLIB.iml" filepath="$PROJECT_DIR$/nervousnetLIB/nervousnetLIB.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nervousnetLIB1/nervousnetLIB1.iml" filepath="$PROJECT_DIR$/nervousnetLIB1/nervousnetLIB1.iml" />
     </modules>
   </component>
 </project>

@@ -6,6 +6,7 @@ import android.util.Log;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ch.ethz.coss.nervousnet.lib.AccelerometerReading;
@@ -66,12 +67,20 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
     public void getSensorIDs(){
         try {
-            nervousnetServiceController.getSensorIDs(null);
+            Log.d("NERVOUSNET", "Sensor IDs " + Arrays.toString(nervousnetServiceController.getSensorIDs()));
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
+
+    public void getSensorLabels(){
+        try {
+            Log.d("NERVOUSNET", "Sensor labels " + Arrays.toString(nervousnetServiceController.getSensorLabels()));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
 
     /////////////////////////////////////////////////////////////////////////
     // LATEST DATA
@@ -123,6 +132,12 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
 
     @Override
     public ArrayList<SensorReading> getLightValues(long startTime, long stopTime) throws RemoteException {
+
+        // TEST
+        getSensorIDs();
+        getSensorLabels();
+
+
         Callback cb = new Callback(SensorType.LIGHT);
         Log.d("NERVOUSNET-LIGHT", "light getReadings start ...");
         nervousnetServiceController.getReadings(LibConstants.SENSOR_LIGHT, startTime, stopTime, cb);

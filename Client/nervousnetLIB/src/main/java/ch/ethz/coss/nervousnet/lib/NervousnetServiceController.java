@@ -224,28 +224,12 @@ public class NervousnetServiceController {
 
     }
 
-    public SensorReading getSensorIDs(RemoteCallback cb) throws RemoteException {
-        if (bindFlag) {
-            if (mService != null) {
-
-                mService.getSensorIDs(cb);
-                return null;
-            } else
-                return new ErrorReading(new String[]{"002", "Nervousnet Service not connected."});
-        } else
-            return new ErrorReading(new String[]{"003", "Nervousnet Service not bound."});
+    public long[] getSensorIDs() throws RemoteException {
+        return mService.getSensorIDs();
     }
 
-    public SensorReading getSensorLabels(RemoteCallback cb) throws RemoteException {
-        if (bindFlag) {
-            if (mService != null) {
-
-                mService.getSensorLabels(cb);
-                return null;
-            } else
-                return new ErrorReading(new String[]{"002", "Nervousnet Service not connected."});
-        } else
-            return new ErrorReading(new String[]{"003", "Nervousnet Service not bound."});
+    public String[] getSensorLabels() throws RemoteException {
+        return mService.getSensorLabels();
     }
 
     private boolean isAppInstalled(String packageName) {

@@ -95,19 +95,17 @@ return true;
 case TRANSACTION_getSensorIDs:
 {
 data.enforceInterface(DESCRIPTOR);
-ch.ethz.coss.nervousnet.lib.RemoteCallback _arg0;
-_arg0 = ch.ethz.coss.nervousnet.lib.RemoteCallback.Stub.asInterface(data.readStrongBinder());
-this.getSensorIDs(_arg0);
+long[] _result = this.getSensorIDs();
 reply.writeNoException();
+reply.writeLongArray(_result);
 return true;
 }
 case TRANSACTION_getSensorLabels:
 {
 data.enforceInterface(DESCRIPTOR);
-ch.ethz.coss.nervousnet.lib.RemoteCallback _arg0;
-_arg0 = ch.ethz.coss.nervousnet.lib.RemoteCallback.Stub.asInterface(data.readStrongBinder());
-this.getSensorLabels(_arg0);
+java.lang.String[] _result = this.getSensorLabels();
 reply.writeNoException();
+reply.writeStringArray(_result);
 return true;
 }
 }
@@ -223,35 +221,39 @@ _reply.recycle();
 _data.recycle();
 }
 }
-@Override public void getSensorIDs(ch.ethz.coss.nervousnet.lib.RemoteCallback cb) throws android.os.RemoteException
+@Override public long[] getSensorIDs() throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
+long[] _result;
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
-_data.writeStrongBinder((((cb!=null))?(cb.asBinder()):(null)));
 mRemote.transact(Stub.TRANSACTION_getSensorIDs, _data, _reply, 0);
 _reply.readException();
+_result = _reply.createLongArray();
 }
 finally {
 _reply.recycle();
 _data.recycle();
 }
+return _result;
 }
-@Override public void getSensorLabels(ch.ethz.coss.nervousnet.lib.RemoteCallback cb) throws android.os.RemoteException
+@Override public java.lang.String[] getSensorLabels() throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
+java.lang.String[] _result;
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
-_data.writeStrongBinder((((cb!=null))?(cb.asBinder()):(null)));
 mRemote.transact(Stub.TRANSACTION_getSensorLabels, _data, _reply, 0);
 _reply.readException();
+_result = _reply.createStringArray();
 }
 finally {
 _reply.recycle();
 _data.recycle();
 }
+return _result;
 }
 }
 static final int TRANSACTION_getNervousnetHubStatus = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
@@ -286,6 +288,6 @@ public void getReading(long sensorType, ch.ethz.coss.nervousnet.lib.RemoteCallba
 	    * cb = Callback object with list that will contain the returned objects of SensorReadings
 	    */
 public void getReadings(long sensorType, long startTime, long endTime, ch.ethz.coss.nervousnet.lib.RemoteCallback cb) throws android.os.RemoteException;
-public void getSensorIDs(ch.ethz.coss.nervousnet.lib.RemoteCallback cb) throws android.os.RemoteException;
-public void getSensorLabels(ch.ethz.coss.nervousnet.lib.RemoteCallback cb) throws android.os.RemoteException;
+public long[] getSensorIDs() throws android.os.RemoteException;
+public java.lang.String[] getSensorLabels() throws android.os.RemoteException;
 }
