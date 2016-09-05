@@ -65,7 +65,11 @@ public class Nervousnet implements iDataSource, NervousnetServiceConnectionListe
     /////////////////////////////////////////////////////////////////////////
 
     public void getSensorIDs(){
-        
+        try {
+            nervousnetServiceController.getSensorIDs(null);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
 
