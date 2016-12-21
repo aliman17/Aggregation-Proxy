@@ -69,6 +69,7 @@ class ServerListener implements Runnable {
 				String msg;
 				while(true){
 					msg = in.readLine();
+					//System.out.println(msg);	
 					if(msg == null) break;
 					BaseMessage bmsg = JsonParser.parse(msg);
 					System.out.println(msg);	
